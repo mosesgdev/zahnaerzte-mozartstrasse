@@ -226,14 +226,14 @@ export default function Home() {
               <FadeIn delay={0.1}>
                 <div className="bg-card rounded-xl p-8 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
                   <div className="flex flex-col sm:flex-row items-start gap-6">
-                    <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 bg-surface-container">
+                    <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
                       {dentists[0].image ? (
                         <Image
                           src={dentists[0].image}
                           alt={dentists[0].name}
-                          width={160}
-                          height={160}
-                          className="w-full h-full object-cover"
+                          width={192}
+                          height={192}
+                          className="w-full h-full object-cover object-top"
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white text-2xl font-bold">

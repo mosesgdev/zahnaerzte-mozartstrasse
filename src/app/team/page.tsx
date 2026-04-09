@@ -38,14 +38,14 @@ export default function TeamPage() {
           <FadeIn>
             <div className="bg-card rounded-xl p-10 lg:p-14 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
               <div className="flex flex-col lg:flex-row items-start gap-10">
-                <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
+                <div className="w-48 h-56 lg:w-56 lg:h-64 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
                   {dentists[0].image ? (
                     <Image
                       src={dentists[0].image}
                       alt={dentists[0].name}
-                      width={320}
-                      height={320}
-                      className="w-full h-full object-cover"
+                      width={448}
+                      height={512}
+                      className="w-full h-full object-cover object-top"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white text-4xl font-bold">
@@ -104,17 +104,17 @@ export default function TeamPage() {
             {assistants.map((member, i) => (
               <FadeIn key={member.name} delay={i * 0.05}>
                 <div className="bg-card rounded-xl p-7 shadow-[0_20px_40px_rgba(16,59,92,0.04)] h-full">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-surface-container mb-5">
+                  <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-surface-container mb-5">
                     {member.image ? (
                       <Image
                         src={member.image}
                         alt={member.name}
-                        width={160}
-                        height={160}
-                        className="w-full h-full object-cover"
+                        width={400}
+                        height={533}
+                        className="w-full h-full object-cover object-top"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-primary text-lg font-bold">
+                      <div className="w-full h-full flex items-center justify-center text-primary text-3xl font-bold">
                         {member.name
                           .split(" ")
                           .map((n) => n[0])

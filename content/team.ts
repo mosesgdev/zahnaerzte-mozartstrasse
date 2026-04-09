@@ -20,6 +20,7 @@ export const dentists: TeamMember[] = [
       "Zertifikat Implantologie: 2010–2011",
       "Praxiseröffnung in Winsen: 2013",
     ],
+    image: "/images/team/boris-shuk.jpg",
   },
 ];
 
@@ -28,23 +29,28 @@ export const assistants: TeamMember[] = [
     name: "Katrin Sellmer",
     role: "Zertifizierte Prophylaxe-Fachkraft, ZFA",
     description: "Spezialisiert auf professionelle Zahnreinigung und Prophylaxe.",
+    image: "/images/team/katrin-sellmer.jpeg",
   },
   {
     name: "Isabell Gohr",
     role: "Praxismanagement, ZFA",
     description: "Verantwortlich für Praxisorganisation und -management.",
+    image: "/images/team/isabell-gohr.jpeg",
   },
   {
     name: "Sylvia Müller",
     role: "Zahnmedizinische Fachangestellte",
+    image: "/images/team/sylvia-mueller.jpg",
   },
   {
     name: "Ümran Avci",
     role: "Zahnmedizinische Fachangestellte",
+    image: "/images/team/uemran-avci.jpeg",
   },
   {
     name: "Nicole Mrdan",
     role: "Zahnmedizinische Angestellte",
+    image: "/images/team/nicole-mrdan.png",
   },
 ];
 

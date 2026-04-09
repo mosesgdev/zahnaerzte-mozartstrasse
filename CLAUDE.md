@@ -26,7 +26,14 @@ All scraped content from the original website is stored in `content/`:
 
 ## Design System
 
-**Pending.** A design system will be provided separately. Do not build pages until the design system is in place.
+**"The Ethereal Clinic"** — High-end editorial aesthetic. Clinical precision meets luxury wellness.
+
+- **Colors:** Primary `#103b5c` (deep blue), Secondary `#1c6d26` (vitality green), Tertiary `#003d54`
+- **Typography:** Manrope (Google Fonts, variable weight 200–800)
+- **Surfaces:** Tonal depth via background shifts (`surface` → `surface-container-low` → `surface-container`), no hard borders
+- **Elevation:** Atmospheric shadows tinted with primary blue, glassmorphic nav header
+- **Buttons:** Primary gradient (primary→primary-container), full radius; Secondary uses surface tones
+- **Source:** `DESIGN.md` in project root
 
 ## Architecture
 

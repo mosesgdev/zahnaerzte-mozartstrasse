@@ -125,6 +125,7 @@ export const pages: Record<string, PageData> = {
 
 export const navigation = {
   main: [
+    { label: "Praxisurlaub", href: "/urlaubszeiten" },
     { label: "Startseite", href: "/" },
     { label: "Praxisgalerie", href: "/praxisgalerie" },
     { label: "Team", href: "/team" },

@@ -37,15 +37,15 @@ export default function TeamPage() {
       <section className="py-24 lg:py-32 bg-surface">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <FadeIn>
-            <div className="bg-card rounded-xl p-10 lg:p-14 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
-              <div className="flex flex-col lg:flex-row items-start gap-10">
-                <div className="w-48 h-56 lg:w-56 lg:h-64 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
+            <div className="bg-card rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
+              <div className="flex flex-col lg:flex-row items-stretch gap-0 lg:gap-0">
+                <div className="w-full lg:w-2/5 rounded-2xl lg:rounded-r-none lg:rounded-l-xl overflow-hidden shrink-0 bg-surface-container aspect-[3/4] lg:aspect-auto">
                   {dentists[0].image ? (
                     <Image
                       src={asset(dentists[0].image!)}
                       alt={dentists[0].name}
-                      width={448}
-                      height={512}
+                      width={600}
+                      height={800}
                       className="w-full h-full object-cover object-top"
                     />
                   ) : (
@@ -54,7 +54,7 @@ export default function TeamPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 p-10 lg:p-14">
                   <h2 className="text-2xl lg:text-3xl font-bold text-primary">
                     {dentists[0].name}
                   </h2>

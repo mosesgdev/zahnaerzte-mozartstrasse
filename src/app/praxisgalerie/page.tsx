@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { pages } from "@content/pages";
 import { FadeIn } from "@/components/shared/FadeIn";
+import { asset } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: pages.gallery.title,
@@ -90,7 +91,7 @@ export default function PraxisgaleriePage() {
                 <div className="group bg-card rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(16,59,92,0.04)] hover:shadow-[0_20px_40px_rgba(16,59,92,0.1)] transition-all duration-500">
                   <div className="aspect-[4/3] overflow-hidden">
                     <Image
-                      src={img.src}
+                      src={asset(img.src)}
                       alt={img.alt}
                       width={600}
                       height={450}

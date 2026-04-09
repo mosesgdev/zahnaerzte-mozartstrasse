@@ -5,6 +5,7 @@ import { dentists, assistants, teamIntro } from "@content/team";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { ArrowRight, Phone } from "lucide-react";
 import { siteData } from "@content/site-data";
+import { asset } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Unser Team",
@@ -41,7 +42,7 @@ export default function TeamPage() {
                 <div className="w-48 h-56 lg:w-56 lg:h-64 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
                   {dentists[0].image ? (
                     <Image
-                      src={dentists[0].image}
+                      src={asset(dentists[0].image!)}
                       alt={dentists[0].name}
                       width={448}
                       height={512}
@@ -107,7 +108,7 @@ export default function TeamPage() {
                   <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-surface-container mb-5">
                     {member.image ? (
                       <Image
-                        src={member.image}
+                        src={asset(member.image!)}
                         alt={member.name}
                         width={400}
                         height={533}

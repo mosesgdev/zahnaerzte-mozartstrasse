@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { navigation } from "@content/pages";
 import { siteData } from "@content/site-data";
+import { asset } from "@/lib/utils";
 
 interface NavItem {
   label: string;
@@ -49,7 +50,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="block">
               <Image
-                src="/images/logo.png"
+                src={asset("/images/logo.png")}
                 alt={siteData.practice.shortName}
                 width={140}
                 height={56}

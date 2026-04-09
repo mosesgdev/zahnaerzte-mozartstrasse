@@ -13,9 +13,9 @@ export const dentists: TeamMember[] = [
     description:
       "Praxisinhaber mit umfassender Erfahrung in ästhetischer Zahnheilkunde und Implantologie.",
     qualifications: [
-      "Zahnmedizin-Studium in Hamburg: 2001–2006",
       "Zahntechniker-Ausbildung: 1988–1991",
       "Zahntechniker-Tätigkeit: 1991–2005",
+      "Zahnmedizin-Studium in Hamburg: 2001–2006",
       "Angestellter Zahnarzt in Hamburg und Reinfeld: 2006–2012",
       "Zertifikat Implantologie: 2010–2011",
       "Praxiseröffnung in Winsen: 2013",

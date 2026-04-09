@@ -14,6 +14,7 @@ import {
   Sparkles,
   Heart,
 } from "lucide-react";
+import { asset } from "@/lib/utils";
 
 export default function Home() {
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
@@ -229,7 +230,7 @@ export default function Home() {
                     <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
                       {dentists[0].image ? (
                         <Image
-                          src={dentists[0].image}
+                          src={asset(dentists[0].image!)}
                           alt={dentists[0].name}
                           width={192}
                           height={192}

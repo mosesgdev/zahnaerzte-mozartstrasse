@@ -27,23 +27,37 @@ export type NewVacation = Omit<Vacation, "id">;
 const REDIS_KEY = "zm:vacations";
 const LOCAL_FILE = path.join(process.cwd(), ".data", "vacations.json");
 
-function hasUpstash(): boolean {
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
-  );
+function redisUrl(): string | undefined {
+  return process.env.STORAGE_REDIS_URL;
+}
+
+// Reuse a single ioredis connection across Fluid Compute invocations / HMR.
+type RedisClient = import("ioredis").Redis;
+const globalForRedis = globalThis as unknown as { _zmRedis?: RedisClient };
+
+async function getRedis(url: string): Promise<RedisClient> {
+  if (globalForRedis._zmRedis) return globalForRedis._zmRedis;
+  const { default: Redis } = await import("ioredis");
+  const client = new Redis(url, { maxRetriesPerRequest: 3 });
+  // Prevent unhandled 'error' events from crashing the serverless function.
+  client.on("error", (err) => console.error("[redis]", err.message));
+  globalForRedis._zmRedis = client;
+  return client;
 }
 
 // ---- Storage backends -------------------------------------------------------
 
 async function readAll(): Promise<Vacation[]> {
-  if (hasUpstash()) {
-    const { Redis } = await import("@upstash/redis");
-    const redis = Redis.fromEnv();
-    const data = await redis.get<Vacation[]>(REDIS_KEY);
+  const url = redisUrl();
+  if (url) {
+    const redis = await getRedis(url);
+    const raw = await redis.get(REDIS_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw);
     return Array.isArray(data) ? data : [];
   }
 
-  // Local-file fallback for development before Upstash is provisioned.
+  // Local-file fallback for development before Redis is provisioned.
   try {
     const raw = await fs.readFile(LOCAL_FILE, "utf8");
     const data = JSON.parse(raw);
@@ -54,10 +68,10 @@ async function readAll(): Promise<Vacation[]> {
 }
 
 async function writeAll(list: Vacation[]): Promise<void> {
-  if (hasUpstash()) {
-    const { Redis } = await import("@upstash/redis");
-    const redis = Redis.fromEnv();
-    await redis.set(REDIS_KEY, list);
+  const url = redisUrl();
+  if (url) {
+    const redis = await getRedis(url);
+    await redis.set(REDIS_KEY, JSON.stringify(list));
     return;
   }
 

@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local dev data fallback (used when Upstash env vars are absent)
+/.data
+
 # vercel
 .vercel
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { siteData } from "@content/site-data";
 import { getVacations } from "@/lib/vacations";
+import { reopeningDateAfter } from "@/lib/holidays";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { CalendarOff, Phone, CalendarCheck, CalendarDays } from "lucide-react";
 
@@ -25,16 +26,14 @@ function formatLong(iso: string): string {
   }).format(parseDate(iso));
 }
 
-/** Reopening = the day after the last closed day. */
+/** Reopening = first business day after the last closed day (no weekend/holiday). */
 function formatReopening(endIso: string): string {
-  const d = parseDate(endIso);
-  d.setDate(d.getDate() + 1);
   return new Intl.DateTimeFormat("de-DE", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(d);
+  }).format(reopeningDateAfter(endIso));
 }
 
 export default async function UrlaubszeitenPage() {
@@ -86,26 +85,53 @@ export default async function UrlaubszeitenPage() {
                       </FadeIn>
                     )}
 
-                    {/* Closure */}
+                    {/* Closure — includes the replacement that covers this period */}
                     <FadeIn delay={i * 0.05}>
                       <div className="bg-card rounded-xl p-8 lg:p-10 shadow-[0_20px_40px_rgba(16,59,92,0.05)] mb-8">
                         <div className="flex items-start gap-4">
                           <CalendarOff className="w-8 h-8 text-destructive shrink-0 mt-1" />
-                          <div>
+                          <div className="w-full">
                             <h2 className="text-xl font-bold text-primary mb-2">
                               Praxis geschlossen
                             </h2>
                             <p className="text-lg text-on-surface-variant font-medium">
                               {formatLong(v.start)} bis {formatLong(v.end)}
                             </p>
+
+                            {/* Vertretung within the closure period */}
+                            <div className="mt-6 pt-6 border-t border-outline-variant/30">
+                              <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
+                                <CalendarDays className="w-4 h-4" />
+                                Vertretung in dieser Zeit
+                              </p>
+                              <h3 className="text-lg font-bold text-primary">
+                                {v.replacement}
+                              </h3>
+                              <div className="mt-2 space-y-2">
+                                {v.replacementPhone && (
+                                  <a
+                                    href={`tel:${v.replacementPhone.replace(/[\s/]/g, "")}`}
+                                    className="flex items-center gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
+                                  >
+                                    <Phone className="w-4 h-4 shrink-0 text-on-surface-variant/50" />
+                                    {v.replacementPhone}
+                                  </a>
+                                )}
+                                {v.note && (
+                                  <p className="text-sm text-on-surface-variant/80 italic">
+                                    {v.note}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </FadeIn>
 
-                    {/* Reopening */}
+                    {/* Reopening — first business day after the closure */}
                     <FadeIn delay={i * 0.05 + 0.05}>
-                      <div className="bg-secondary-fixed/10 rounded-xl p-8 lg:p-10 mb-8">
+                      <div className="bg-secondary-fixed/10 rounded-xl p-8 lg:p-10">
                         <div className="flex items-start gap-4">
                           <CalendarCheck className="w-8 h-8 text-secondary shrink-0 mt-1" />
                           <div>
@@ -116,35 +142,6 @@ export default async function UrlaubszeitenPage() {
                               {formatReopening(v.end)}
                             </p>
                           </div>
-                        </div>
-                      </div>
-                    </FadeIn>
-
-                    {/* Replacement / emergency cover */}
-                    <FadeIn delay={i * 0.05 + 0.1}>
-                      <div className="bg-card rounded-xl p-6 lg:p-8 shadow-[0_20px_40px_rgba(16,59,92,0.04)]">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
-                          <CalendarDays className="w-4 h-4" />
-                          Vertretung während unserer Abwesenheit
-                        </p>
-                        <h3 className="text-lg font-bold text-primary">
-                          {v.replacement}
-                        </h3>
-                        <div className="mt-3 space-y-2">
-                          {v.replacementPhone && (
-                            <a
-                              href={`tel:${v.replacementPhone.replace(/[\s/]/g, "")}`}
-                              className="flex items-center gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
-                            >
-                              <Phone className="w-4 h-4 shrink-0 text-on-surface-variant/50" />
-                              {v.replacementPhone}
-                            </a>
-                          )}
-                          {v.note && (
-                            <p className="text-sm text-on-surface-variant/80 italic">
-                              {v.note}
-                            </p>
-                          )}
                         </div>
                       </div>
                     </FadeIn>

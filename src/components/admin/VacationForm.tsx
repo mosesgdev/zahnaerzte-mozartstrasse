@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import {
   createVacationAction,
   type VacationFormState,
 } from "@/app/admin/actions";
+import { vertretungen } from "@content/vertretungen";
 import { Button } from "@/components/ui/button";
 
 const initialState: VacationFormState = {};
@@ -20,10 +21,13 @@ export function VacationForm() {
     initialState,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const [replacementId, setReplacementId] = useState("");
+  const isOther = replacementId === "andere";
 
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset();
+      setReplacementId("");
     }
   }, [state.success]);
 
@@ -45,31 +49,58 @@ export function VacationForm() {
       </div>
 
       <div>
-        <label htmlFor="replacement" className={labelClass}>
+        <label htmlFor="replacementId" className={labelClass}>
           Vertretung (Praxis / Zahnarzt)
         </label>
-        <input
-          id="replacement"
-          name="replacement"
-          type="text"
+        <select
+          id="replacementId"
+          name="replacementId"
           required
-          placeholder="z. B. Zahnarztpraxis Wussow"
+          value={replacementId}
+          onChange={(e) => setReplacementId(e.target.value)}
           className={fieldClass}
-        />
+        >
+          <option value="" disabled>
+            Bitte wählen…
+          </option>
+          {vertretungen.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.name} ({v.address})
+            </option>
+          ))}
+          <option value="andere">Andere Praxis (manuell eingeben)</option>
+        </select>
       </div>
 
-      <div>
-        <label htmlFor="replacementPhone" className={labelClass}>
-          Telefon der Vertretung <span className="text-on-surface-variant/60">(optional)</span>
-        </label>
-        <input
-          id="replacementPhone"
-          name="replacementPhone"
-          type="tel"
-          placeholder="z. B. 04171 2917"
-          className={fieldClass}
-        />
-      </div>
+      {isOther && (
+        <div className="space-y-5 rounded-lg bg-surface-container/60 p-4">
+          <div>
+            <label htmlFor="replacement" className={labelClass}>
+              Name der Vertretung
+            </label>
+            <input
+              id="replacement"
+              name="replacement"
+              type="text"
+              placeholder="z. B. Zahnarztpraxis Mustermann"
+              className={fieldClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="replacementPhone" className={labelClass}>
+              Telefon der Vertretung{" "}
+              <span className="text-on-surface-variant/60">(optional)</span>
+            </label>
+            <input
+              id="replacementPhone"
+              name="replacementPhone"
+              type="tel"
+              placeholder="z. B. 04171 2917"
+              className={fieldClass}
+            />
+          </div>
+        </div>
+      )}
 
       <div>
         <label htmlFor="note" className={labelClass}>

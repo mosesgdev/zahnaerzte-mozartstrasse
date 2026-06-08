@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { timingSafeEqual } from "node:crypto";
 import { createSession, deleteSession, requireAuth } from "@/lib/session";
 import { addVacation, deleteVacation } from "@/lib/vacations";
+import { findVertretung } from "@content/vertretungen";
 
 export interface LoginState {
   error?: string;
@@ -51,8 +52,7 @@ export async function createVacationAction(
 
   const start = String(formData.get("start") ?? "").trim();
   const end = String(formData.get("end") ?? "").trim();
-  const replacement = String(formData.get("replacement") ?? "").trim();
-  const replacementPhone = String(formData.get("replacementPhone") ?? "").trim();
+  const replacementId = String(formData.get("replacementId") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
 
   if (!start || !end) {
@@ -61,6 +61,22 @@ export async function createVacationAction(
   if (end < start) {
     return { error: "Das Enddatum darf nicht vor dem Startdatum liegen." };
   }
+
+  // Resolve the replacement: either a known practice (dropdown) or manual entry.
+  let replacement: string;
+  let replacementPhone: string;
+  if (replacementId && replacementId !== "andere") {
+    const practice = findVertretung(replacementId);
+    if (!practice) {
+      return { error: "Unbekannte Vertretung ausgewählt." };
+    }
+    replacement = practice.name;
+    replacementPhone = practice.phone;
+  } else {
+    replacement = String(formData.get("replacement") ?? "").trim();
+    replacementPhone = String(formData.get("replacementPhone") ?? "").trim();
+  }
+
   if (!replacement) {
     return { error: "Bitte eine Vertretung angeben." };
   }

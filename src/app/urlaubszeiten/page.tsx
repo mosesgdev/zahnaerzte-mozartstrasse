@@ -3,7 +3,13 @@ import { siteData } from "@content/site-data";
 import { getVacations } from "@/lib/vacations";
 import { reopeningDateAfter } from "@/lib/holidays";
 import { FadeIn } from "@/components/shared/FadeIn";
-import { CalendarOff, Phone, CalendarCheck, CalendarDays } from "lucide-react";
+import {
+  CalendarOff,
+  Phone,
+  MapPin,
+  CalendarCheck,
+  CalendarDays,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Praxisurlaub",
@@ -98,32 +104,54 @@ export default async function UrlaubszeitenPage() {
                               {formatLong(v.start)} bis {formatLong(v.end)}
                             </p>
 
-                            {/* Vertretung within the closure period */}
-                            <div className="mt-6 pt-6 border-t border-outline-variant/30">
-                              <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
-                                <CalendarDays className="w-4 h-4" />
-                                Vertretung in dieser Zeit
-                              </p>
-                              <h3 className="text-lg font-bold text-primary">
-                                {v.replacement}
-                              </h3>
-                              <div className="mt-2 space-y-2">
-                                {v.replacementPhone && (
-                                  <a
-                                    href={`tel:${v.replacementPhone.replace(/[\s/]/g, "")}`}
-                                    className="flex items-center gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
-                                  >
-                                    <Phone className="w-4 h-4 shrink-0 text-on-surface-variant/50" />
-                                    {v.replacementPhone}
-                                  </a>
-                                )}
+                            {/* Vertretungen within the closure period */}
+                            {v.replacements.length > 0 && (
+                              <div className="mt-6 pt-6 border-t border-outline-variant/30">
+                                <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] mb-4 flex items-center gap-2">
+                                  <CalendarDays className="w-4 h-4" />
+                                  Vertretung in dieser Zeit
+                                </p>
+                                <div className="space-y-5">
+                                  {v.replacements.map((r, ri) => (
+                                    <div key={ri}>
+                                      {(v.replacements.length > 1 ||
+                                        r.from !== v.start ||
+                                        r.to !== v.end) && (
+                                        <p className="text-sm font-semibold text-on-surface-variant mb-1">
+                                          {formatLong(r.from)} bis{" "}
+                                          {formatLong(r.to)}
+                                        </p>
+                                      )}
+                                      <h3 className="text-lg font-bold text-primary">
+                                        {r.name}
+                                      </h3>
+                                      <div className="mt-1 space-y-1.5">
+                                        {r.address && (
+                                          <p className="flex items-center gap-2.5 text-sm text-on-surface-variant">
+                                            <MapPin className="w-4 h-4 shrink-0 text-on-surface-variant/50" />
+                                            {r.address}
+                                          </p>
+                                        )}
+                                        {r.phone && (
+                                          <a
+                                            href={`tel:${r.phone.replace(/[\s/]/g, "")}`}
+                                            className="flex items-center gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
+                                          >
+                                            <Phone className="w-4 h-4 shrink-0 text-on-surface-variant/50" />
+                                            {r.phone}
+                                          </a>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
                                 {v.note && (
-                                  <p className="text-sm text-on-surface-variant/80 italic">
+                                  <p className="mt-4 text-sm text-on-surface-variant/80 italic">
                                     {v.note}
                                   </p>
                                 )}
                               </div>
-                            </div>
+                            )}
                           </div>
                         </div>
                       </div>

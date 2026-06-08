@@ -1,108 +1,93 @@
 import "server-only";
 
-import { promises as fs } from "node:fs";
-import path from "node:path";
+import { getJson, setJson } from "@/lib/kv";
 
-/**
- * A single vacation/absence entry for Dr. Boris Shuk.
- * `replacement` is the covering dentist/practice (free text, since the
- * practice has a single dentist — cover is typically an external practice).
- */
+/** One covering practice and the sub-range of the closure it is responsible for. */
+export interface ReplacementAssignment {
+  name: string;
+  phone?: string;
+  address?: string;
+  /** ISO date (YYYY-MM-DD) */
+  from: string;
+  /** ISO date (YYYY-MM-DD) */
+  to: string;
+}
+
+/** A vacation/absence period for the practice. */
 export interface Vacation {
   id: string;
   /** ISO date (YYYY-MM-DD) */
   start: string;
   /** ISO date (YYYY-MM-DD) */
   end: string;
-  /** Name of the covering dentist or practice */
-  replacement: string;
-  /** Optional phone number for the replacement */
-  replacementPhone?: string;
-  /** Optional free-text note */
+  /** One or more replacements, each covering specific days. */
+  replacements: ReplacementAssignment[];
   note?: string;
 }
 
 export type NewVacation = Omit<Vacation, "id">;
 
-const REDIS_KEY = "zm:vacations";
-const LOCAL_FILE = path.join(process.cwd(), ".data", "vacations.json");
+const KEY = "zm:vacations";
 
-function redisUrl(): string | undefined {
-  return process.env.STORAGE_REDIS_URL;
+// Legacy shape (single replacement) — normalized on read.
+interface LegacyVacation {
+  id: string;
+  start: string;
+  end: string;
+  replacement?: string;
+  replacementPhone?: string;
+  replacements?: ReplacementAssignment[];
+  note?: string;
 }
 
-// Reuse a single ioredis connection across Fluid Compute invocations / HMR.
-type RedisClient = import("ioredis").Redis;
-const globalForRedis = globalThis as unknown as { _zmRedis?: RedisClient };
-
-async function getRedis(url: string): Promise<RedisClient> {
-  if (globalForRedis._zmRedis) return globalForRedis._zmRedis;
-  const { default: Redis } = await import("ioredis");
-  const client = new Redis(url, { maxRetriesPerRequest: 3 });
-  // Prevent unhandled 'error' events from crashing the serverless function.
-  client.on("error", (err) => console.error("[redis]", err.message));
-  globalForRedis._zmRedis = client;
-  return client;
+function normalize(v: LegacyVacation): Vacation {
+  const replacements: ReplacementAssignment[] = Array.isArray(v.replacements)
+    ? v.replacements
+    : v.replacement
+      ? [
+          {
+            name: v.replacement,
+            phone: v.replacementPhone,
+            from: v.start,
+            to: v.end,
+          },
+        ]
+      : [];
+  return {
+    id: v.id,
+    start: v.start,
+    end: v.end,
+    replacements,
+    note: v.note,
+  };
 }
-
-// ---- Storage backends -------------------------------------------------------
-
-async function readAll(): Promise<Vacation[]> {
-  const url = redisUrl();
-  if (url) {
-    const redis = await getRedis(url);
-    const raw = await redis.get(REDIS_KEY);
-    if (!raw) return [];
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
-  }
-
-  // Local-file fallback for development before Redis is provisioned.
-  try {
-    const raw = await fs.readFile(LOCAL_FILE, "utf8");
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-}
-
-async function writeAll(list: Vacation[]): Promise<void> {
-  const url = redisUrl();
-  if (url) {
-    const redis = await getRedis(url);
-    await redis.set(REDIS_KEY, JSON.stringify(list));
-    return;
-  }
-
-  await fs.mkdir(path.dirname(LOCAL_FILE), { recursive: true });
-  await fs.writeFile(LOCAL_FILE, JSON.stringify(list, null, 2), "utf8");
-}
-
-// ---- Public API -------------------------------------------------------------
 
 /** All vacations, sorted by start date ascending. */
 export async function getVacations(): Promise<Vacation[]> {
-  const list = await readAll();
-  return [...list].sort((a, b) => a.start.localeCompare(b.start));
+  const list = await getJson<LegacyVacation[]>(KEY, []);
+  return list
+    .map(normalize)
+    .sort((a, b) => a.start.localeCompare(b.start));
 }
 
 export async function addVacation(input: NewVacation): Promise<Vacation> {
-  const list = await readAll();
+  const list = await getJson<LegacyVacation[]>(KEY, []);
   const vacation: Vacation = {
     id: crypto.randomUUID(),
     start: input.start,
     end: input.end,
-    replacement: input.replacement.trim(),
-    replacementPhone: input.replacementPhone?.trim() || undefined,
+    replacements: input.replacements,
     note: input.note?.trim() || undefined,
   };
   list.push(vacation);
-  await writeAll(list);
+  await setJson(KEY, list);
   return vacation;
 }
 
 export async function deleteVacation(id: string): Promise<void> {
-  const list = await readAll();
-  await writeAll(list.filter((v) => v.id !== id));
+  const list = await getJson<LegacyVacation[]>(KEY, []);
+  await setJson(
+    KEY,
+    list.filter((v) => v.id !== id),
+  );
 }

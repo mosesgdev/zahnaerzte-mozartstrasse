@@ -1,8 +1,9 @@
 import { requireAuth } from "@/lib/session";
 import { getVacations } from "@/lib/vacations";
+import { getAllVertretungen } from "@/lib/vertretungen";
 import { deleteVacationAction, logout } from "./actions";
 import { VacationForm } from "@/components/admin/VacationForm";
-import { CalendarOff, Phone, Trash2, Plus, LogOut } from "lucide-react";
+import { CalendarOff, Phone, MapPin, Trash2, Plus, LogOut } from "lucide-react";
 
 export const metadata = {
   title: "Urlaubsverwaltung",
@@ -20,7 +21,10 @@ function formatDate(iso: string): string {
 
 export default async function AdminPage() {
   await requireAuth();
-  const vacations = await getVacations();
+  const [vacations, vertretungen] = await Promise.all([
+    getVacations(),
+    getAllVertretungen(),
+  ]);
 
   return (
     <section className="py-16 lg:py-24 bg-surface min-h-[70vh]">
@@ -52,7 +56,7 @@ export default async function AdminPage() {
             <Plus className="w-5 h-5 text-secondary" />
             Neue Urlaubszeit
           </h2>
-          <VacationForm />
+          <VacationForm vertretungen={vertretungen} />
         </div>
 
         {/* List */}
@@ -74,25 +78,37 @@ export default async function AdminPage() {
                 key={v.id}
                 className="bg-card rounded-2xl p-6 lg:p-7 shadow-[0_20px_50px_rgba(16,59,92,0.05)] flex items-start justify-between gap-4"
               >
-                <div>
+                <div className="min-w-0">
                   <p className="text-base font-bold text-primary">
                     {formatDate(v.start)} – {formatDate(v.end)}
                   </p>
-                  <p className="mt-2 text-sm text-on-surface-variant">
-                    <span className="font-medium text-foreground">Vertretung:</span>{" "}
-                    {v.replacement}
-                  </p>
-                  {v.replacementPhone && (
-                    <a
-                      href={`tel:${v.replacementPhone.replace(/[\s/]/g, "")}`}
-                      className="mt-1.5 inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors"
-                    >
-                      <Phone className="w-3.5 h-3.5 text-on-surface-variant/50" />
-                      {v.replacementPhone}
-                    </a>
-                  )}
+                  <ul className="mt-3 space-y-3">
+                    {v.replacements.map((r, idx) => (
+                      <li key={idx} className="text-sm">
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.1em]">
+                          {formatDate(r.from)} – {formatDate(r.to)}
+                        </p>
+                        <p className="font-medium text-foreground">{r.name}</p>
+                        {r.address && (
+                          <p className="flex items-center gap-1.5 text-on-surface-variant">
+                            <MapPin className="w-3.5 h-3.5 text-on-surface-variant/50" />
+                            {r.address}
+                          </p>
+                        )}
+                        {r.phone && (
+                          <a
+                            href={`tel:${r.phone.replace(/[\s/]/g, "")}`}
+                            className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors"
+                          >
+                            <Phone className="w-3.5 h-3.5 text-on-surface-variant/50" />
+                            {r.phone}
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                   {v.note && (
-                    <p className="mt-1.5 text-sm text-on-surface-variant/80 italic">
+                    <p className="mt-2 text-sm text-on-surface-variant/80 italic">
                       {v.note}
                     </p>
                   )}

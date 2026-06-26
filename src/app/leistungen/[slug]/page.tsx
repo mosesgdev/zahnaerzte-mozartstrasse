@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { services } from "@content/services";
+import { getServiceSettings } from "@/lib/service-settings";
 import { siteData } from "@content/site-data";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { ArrowLeft, ArrowRight, Phone, Check } from "lucide-react";
+import { asset } from "@/lib/utils";
 
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
 }
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -16,7 +21,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const { services: editableServices } = await getServiceSettings();
+  const service = editableServices.find((s) => s.slug === slug);
   if (!service) return {};
   return {
     title: service.title,
@@ -30,6 +36,7 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const { services } = await getServiceSettings();
   const service = services.find((s) => s.slug === slug);
   if (!service) notFound();
 
@@ -73,6 +80,25 @@ export default async function ServiceDetailPage({
                   </div>
                 )}
                 <div className="space-y-5">
+                  {service.image && (
+                    <div className="mb-10 overflow-hidden rounded-xl bg-surface-container">
+                      {service.image.startsWith("data:") ? (
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          className="aspect-[16/9] w-full object-cover"
+                        />
+                      ) : (
+                        <Image
+                          src={asset(service.image)}
+                          alt={service.title}
+                          width={900}
+                          height={506}
+                          className="aspect-[16/9] w-full object-cover"
+                        />
+                      )}
+                    </div>
+                  )}
                   {service.content.map((paragraph, i) => (
                     <p
                       key={i}

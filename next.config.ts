@@ -6,8 +6,14 @@ import type { NextConfig } from "next";
 // request-time cookies. Public pages are still statically prerendered and
 // served from Vercel's edge — only /admin and its actions run dynamically.
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["127.0.0.1"],
   images: {
     unoptimized: true,
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "8mb",
+    },
   },
 };
 

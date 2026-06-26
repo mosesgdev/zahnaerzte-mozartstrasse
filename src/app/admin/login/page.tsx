@@ -22,7 +22,7 @@ export default async function AdminLoginPage() {
           </p>
           <h1 className="text-2xl font-bold text-primary mb-2">Anmeldung</h1>
           <p className="text-sm text-on-surface-variant mb-8">
-            Bitte geben Sie das Praxis-Passwort ein, um Urlaubszeiten zu
+            Bitte geben Sie das Praxis-Passwort ein, um die Praxisinhalte zu
             verwalten.
           </p>
           <LoginForm />

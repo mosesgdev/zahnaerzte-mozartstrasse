@@ -3,6 +3,7 @@ export interface Service {
   title: string;
   pageTitle: string;
   shortDescription: string;
+  image?: string;
   content: string[];
   bulletPoints?: string[];
   underConstruction?: boolean;
@@ -15,6 +16,7 @@ export const services: Service[] = [
     pageTitle: "Professionelle Zahnreinigung – aber richtig",
     shortDescription:
       "Regelmäßige professionelle Zahnreinigung für lebenslang gesunde Zähne.",
+    image: "/images/prophylaxe-full.jpg",
     content: [
       "Langzeitstudien zeigen: Nur mit regelmäßiger professioneller Zahnreinigung können Zähne ein Leben lang erhalten werden.",
       "Unsere zertifizierte Prophylaxe-Fachkraft Katrin Sellmer betreut Sie mit modernsten Instrumenten und individueller Beratung.",
@@ -63,6 +65,7 @@ export const services: Service[] = [
     pageTitle: "Keramik – Ästhetik in Perfektion",
     shortDescription:
       "Vollkeramische Inlays, Kronen und Brücken für perfekte Ästhetik.",
+    image: "/images/vollkeramik.jpg",
     content: [
       "Die Verwendung von vollkeramischen Inlays, Kronen und Brücken in unserer Zahnarztpraxis ist ein wesentlicher Bestandteil der modernen ästhetischen Zahnmedizin.",
     ],
@@ -108,6 +111,7 @@ export const services: Service[] = [
     pageTitle: "Implantate",
     shortDescription:
       "Künstliche Zahnwurzeln aus Titan für stabilen, natürlichen Zahnersatz.",
+    image: "/images/implantate.jpg",
     content: [
       "Implantate sind künstliche Zahnwurzeln, meist aus Titan, die dort eingesetzt werden, wo Zähne fehlen.",
     ],
@@ -135,6 +139,7 @@ export const services: Service[] = [
     pageTitle: "Lasergestützte Endodontie",
     shortDescription:
       "Moderne Wurzelkanalbehandlung mit lasergestützter Technik.",
+    image: "/images/wurzelkanal.jpg",
     content: [
       "Modernste Endodontie mit lasergestützter Keimreduktion für bestmögliche Behandlungsergebnisse.",
     ],

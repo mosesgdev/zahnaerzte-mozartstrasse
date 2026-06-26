@@ -125,11 +125,6 @@ export const pages: Record<string, PageData> = {
 
 export const navigation = {
   main: [
-    { label: "Praxisurlaub", href: "/urlaubszeiten" },
-    { label: "Startseite", href: "/" },
-    { label: "Praxisgalerie", href: "/praxisgalerie" },
-    { label: "Team", href: "/team" },
-    { label: "Information", href: "/information" },
     {
       label: "Leistungen",
       href: "/leistungen",
@@ -152,7 +147,33 @@ export const navigation = {
         { label: "Specials", href: "/leistungen/specials" },
       ],
     },
-    { label: "Service", href: "/service" },
+    {
+      label: "Praxis",
+      href: "/team",
+      children: [
+        { label: "Team", href: "/team" },
+        { label: "Praxisgalerie", href: "/praxisgalerie" },
+        { label: "Barrierefreiheit & Parken", href: "/service" },
+      ],
+    },
+    {
+      label: "Patienteninfo",
+      href: "/information",
+      children: [
+        { label: "Information", href: "/information" },
+        { label: "Urlaub & Vertretung", href: "/urlaubszeiten" },
+      ],
+    },
+    { label: "Notdienst", href: "/notdienst" },
+    { label: "Anfahrt", href: "/anfahrt" },
+    { label: "Kontakt", href: "/kontakt" },
+  ],
+  utility: [],
+  quickLinks: [
+    { label: "Notdienst", href: "/notdienst" },
+    { label: "Urlaub & Vertretung", href: "/urlaubszeiten" },
+    { label: "Team", href: "/team" },
+    { label: "Praxisgalerie", href: "/praxisgalerie" },
     { label: "Anfahrt", href: "/anfahrt" },
     { label: "Kontakt", href: "/kontakt" },
   ],

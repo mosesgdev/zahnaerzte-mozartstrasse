@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { services, servicesOverview } from "@content/services";
+import { getServiceSettings } from "@/lib/service-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { ArrowRight, Phone } from "lucide-react";
 import { siteData } from "@content/site-data";
+import { asset } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Unsere Leistungen",
@@ -11,7 +13,33 @@ export const metadata: Metadata = {
     "Unser Behandlungsspektrum: Implantologie, Prophylaxe, Parodontitis, Vollkeramik, Laserbehandlung, Zahnersatz und mehr in Winsen (Luhe).",
 };
 
-export default function LeistungenPage() {
+export const dynamic = "force-dynamic";
+
+function ServiceImage({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}) {
+  const className = "h-40 w-full object-cover transition-transform duration-700 group-hover:scale-105";
+  if (src.startsWith("data:")) {
+    return <img src={src} alt={alt} className={className} />;
+  }
+  return (
+    <Image
+      src={asset(src)}
+      alt={alt}
+      width={600}
+      height={360}
+      className={className}
+    />
+  );
+}
+
+export default async function LeistungenPage() {
+  const { services, overview } = await getServiceSettings();
+
   return (
     <>
       {/* Header */}
@@ -22,7 +50,7 @@ export default function LeistungenPage() {
               Behandlungsspektrum
             </p>
             <h1 className="text-4xl lg:text-[3.5rem] font-bold text-white leading-[1.08]">
-              {servicesOverview.heading}
+              {overview.heading}
             </h1>
           </FadeIn>
         </div>
@@ -38,6 +66,11 @@ export default function LeistungenPage() {
                   href={`/leistungen/${service.slug}`}
                   className="group block h-full bg-card rounded-xl p-8 shadow-[0_20px_40px_rgba(16,59,92,0.03)] hover:shadow-[0_20px_40px_rgba(16,59,92,0.1)] transition-all duration-500 hover:-translate-y-1"
                 >
+                  {service.image && (
+                    <div className="-mx-8 -mt-8 mb-6 overflow-hidden rounded-t-xl bg-surface-container">
+                      <ServiceImage src={service.image} alt={service.title} />
+                    </div>
+                  )}
                   <h3 className="text-lg font-bold text-primary group-hover:text-tertiary transition-colors">
                     {service.title}
                   </h3>
@@ -65,10 +98,10 @@ export default function LeistungenPage() {
           <div className="grid lg:grid-cols-2 gap-16">
             <FadeIn>
               <h2 className="text-2xl lg:text-3xl font-bold text-primary mb-8">
-                {servicesOverview.treatmentHeading}
+                {overview.treatmentHeading}
               </h2>
               <div className="grid grid-cols-2 gap-3">
-                {servicesOverview.allServices.map((s) => (
+                {overview.allServices.map((s) => (
                   <div
                     key={s}
                     className="flex items-start gap-2.5 text-sm text-on-surface-variant"
@@ -85,7 +118,7 @@ export default function LeistungenPage() {
                   Angstpatienten
                 </h3>
                 <p className="text-base text-on-surface-variant leading-[1.8]">
-                  {servicesOverview.anxiousPatients}
+                  {overview.anxiousPatients}
                 </p>
                 <a
                   href={`tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`}

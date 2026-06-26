@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import {
   createVacationAction,
   type VacationFormState,
@@ -30,10 +30,6 @@ function newRow(key: number, from = "", to = ""): Row {
 }
 
 export function VacationForm({ vertretungen }: { vertretungen: Vertretung[] }) {
-  const [state, action, pending] = useActionState(
-    createVacationAction,
-    initialState,
-  );
   const formRef = useRef<HTMLFormElement>(null);
   const keyCounter = useRef(1);
 
@@ -41,15 +37,20 @@ export function VacationForm({ vertretungen }: { vertretungen: Vertretung[] }) {
   const [end, setEnd] = useState("");
   const [rows, setRows] = useState<Row[]>([newRow(0)]);
 
-  useEffect(() => {
-    if (state.success) {
-      formRef.current?.reset();
-      setStart("");
-      setEnd("");
-      keyCounter.current = 1;
-      setRows([newRow(0)]);
-    }
-  }, [state.success]);
+  const [state, action, pending] = useActionState(
+    async (prev: VacationFormState, formData: FormData) => {
+      const result = await createVacationAction(prev, formData);
+      if (result.success) {
+        formRef.current?.reset();
+        setStart("");
+        setEnd("");
+        keyCounter.current = 1;
+        setRows([newRow(0)]);
+      }
+      return result;
+    },
+    initialState,
+  );
 
   function updateRow(key: number, patch: Partial<Row>) {
     setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));

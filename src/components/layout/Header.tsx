@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Phone, ChevronDown } from "lucide-react";
+import { AlertCircle, Menu, X, Phone, ChevronDown } from "lucide-react";
 import { navigation } from "@content/pages";
 import { siteData } from "@content/site-data";
 import { asset } from "@/lib/utils";
@@ -15,10 +15,12 @@ interface NavItem {
 }
 
 const navItems = navigation.main as NavItem[];
+const utilityItems = navigation.utility as NavItem[];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
+  const [desktopDropdown, setDesktopDropdown] = useState<string | null>(null);
+  const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -66,21 +68,30 @@ export default function Header() {
                   <div
                     key={item.label}
                     className="relative group"
-                    onMouseEnter={() => setServicesOpen(true)}
-                    onMouseLeave={() => setServicesOpen(false)}
+                    onMouseEnter={() => setDesktopDropdown(item.label)}
+                    onMouseLeave={() => setDesktopDropdown(null)}
+                    onFocus={() => setDesktopDropdown(item.label)}
                   >
                     <Link
                       href={item.href}
-                      className="flex items-center gap-1 px-3.5 py-2 text-[13px] font-medium text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-surface-low"
+                      className={`flex items-center gap-1 px-3.5 py-2 text-[13px] font-medium transition-colors rounded-full ${
+                        desktopDropdown === item.label
+                          ? "bg-surface-low text-primary"
+                          : "text-foreground/70 hover:text-primary hover:bg-surface-low"
+                      }`}
                     >
                       {item.label}
-                      <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                      <ChevronDown
+                        className={`w-3 h-3 transition-transform ${
+                          desktopDropdown === item.label ? "rotate-180" : ""
+                        }`}
+                      />
                     </Link>
                     <div
                       className={`absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-200 ${
-                        servicesOpen
-                          ? "opacity-100 visible translate-y-0"
-                          : "opacity-0 invisible -translate-y-2"
+                        desktopDropdown === item.label
+                          ? "opacity-100 visible translate-y-0 pointer-events-auto"
+                          : "opacity-0 invisible -translate-y-2 pointer-events-none"
                       }`}
                     >
                       <div className="w-72 bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_20px_40px_rgba(16,59,92,0.12)] p-2.5">
@@ -110,6 +121,16 @@ export default function Header() {
 
             {/* CTA + mobile toggle */}
             <div className="flex items-center gap-3">
+              {utilityItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="hidden md:inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-2 text-sm font-semibold text-secondary transition-colors hover:bg-secondary/15 hover:text-primary"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              ))}
               <a
                 href={phoneHref}
                 className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-primary to-primary-container rounded-full hover:shadow-[0_8px_24px_rgba(16,59,92,0.3)] transition-all duration-300"
@@ -158,33 +179,57 @@ export default function Header() {
           }`}
         >
           <nav className="p-6 space-y-1">
+            {utilityItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className="mb-3 flex items-center justify-between rounded-xl bg-secondary/10 px-4 py-3 text-base font-semibold text-secondary hover:bg-secondary/15 hover:text-primary transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  {item.label}
+                </span>
+                <span className="text-xs font-medium text-on-surface-variant">
+                  aktuell
+                </span>
+              </Link>
+            ))}
             {navItems.map((item) =>
               item.children ? (
                 <div key={item.label}>
                   <button
-                    onClick={() => setServicesOpen(!servicesOpen)}
+                    onClick={() =>
+                      setMobileDropdown(
+                        mobileDropdown === item.label ? null : item.label,
+                      )
+                    }
                     className="w-full flex items-center justify-between px-4 py-3 text-base font-medium text-foreground hover:text-primary rounded-xl hover:bg-surface-low transition-colors"
                   >
                     {item.label}
                     <ChevronDown
                       className={`w-4 h-4 transition-transform duration-200 ${
-                        servicesOpen ? "rotate-180" : ""
+                        mobileDropdown === item.label ? "rotate-180" : ""
                       }`}
                     />
                   </button>
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
-                      servicesOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                      mobileDropdown === item.label
+                        ? "max-h-[500px] opacity-100"
+                        : "max-h-0 opacity-0"
                     }`}
                   >
                     <div className="ml-4 mt-1 space-y-0.5 pb-2">
-                      <Link
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className="block px-4 py-2.5 text-sm text-foreground/70 hover:text-primary rounded-lg hover:bg-surface-low transition-colors font-medium"
-                      >
-                        Alle Leistungen
-                      </Link>
+                      {item.children[0]?.href !== item.href && (
+                        <Link
+                          href={item.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-foreground/70 hover:text-primary rounded-lg hover:bg-surface-low transition-colors font-medium"
+                        >
+                          Alle {item.label}
+                        </Link>
+                      )}
                       {item.children.map((child) => (
                         <Link
                           key={child.href}

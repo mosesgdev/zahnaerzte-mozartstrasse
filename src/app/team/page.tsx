@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { dentists, assistants, teamIntro } from "@content/team";
+import { getTeamSettings } from "@/lib/team-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { ArrowRight, Phone } from "lucide-react";
 import { siteData } from "@content/site-data";
@@ -13,7 +13,38 @@ export const metadata: Metadata = {
     "Lernen Sie das Team der Zahnarztpraxis Boris Shuk in Winsen (Luhe) kennen. Zahnarzt, Prophylaxe-Fachkraft und zahnmedizinische Fachangestellte.",
 };
 
-export default function TeamPage() {
+export const dynamic = "force-dynamic";
+
+function TeamImage({
+  src,
+  alt,
+  className,
+}: {
+  src?: string;
+  alt: string;
+  className: string;
+}) {
+  if (!src) return null;
+  if (src.startsWith("data:")) {
+    return <img src={src} alt={alt} className={className} />;
+  }
+  return (
+    <Image
+      src={asset(src)}
+      alt={alt}
+      width={600}
+      height={800}
+      className={className}
+    />
+  );
+}
+
+export default async function TeamPage() {
+  const { intro, members } = await getTeamSettings();
+  const dentists = members.filter((member) => member.group === "dentists");
+  const assistants = members.filter((member) => member.group === "assistants");
+  const mainDentist = dentists[0];
+
   return (
     <>
       {/* Header */}
@@ -24,10 +55,10 @@ export default function TeamPage() {
               Team
             </p>
             <h1 className="text-4xl lg:text-[3.5rem] font-bold text-white leading-[1.08]">
-              {teamIntro.heading}
+              {intro.heading}
             </h1>
             <p className="mt-6 text-lg text-white/60 max-w-xl leading-relaxed">
-              {teamIntro.text}
+              {intro.text}
             </p>
           </FadeIn>
         </div>
@@ -40,12 +71,10 @@ export default function TeamPage() {
             <div className="bg-card rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
               <div className="flex flex-col lg:flex-row items-stretch gap-0 lg:gap-0">
                 <div className="w-full lg:w-2/5 rounded-2xl lg:rounded-r-none lg:rounded-l-xl overflow-hidden shrink-0 bg-surface-container aspect-[3/4] lg:aspect-auto">
-                  {dentists[0].image ? (
-                    <Image
-                      src={asset(dentists[0].image!)}
-                      alt={dentists[0].name}
-                      width={600}
-                      height={800}
+                  {mainDentist?.image ? (
+                    <TeamImage
+                      src={mainDentist.image}
+                      alt={mainDentist.name}
                       className="w-full h-full object-cover object-top"
                     />
                   ) : (
@@ -56,32 +85,33 @@ export default function TeamPage() {
                 </div>
                 <div className="flex-1 p-10 lg:p-14">
                   <h2 className="text-2xl lg:text-3xl font-bold text-primary">
-                    {dentists[0].name}
+                    {mainDentist?.name ?? "Unser Team"}
                   </h2>
                   <p className="text-base text-secondary font-medium mt-1">
-                    {dentists[0].role}
+                    {mainDentist?.role ?? ""}
                   </p>
                   <p className="mt-6 text-base text-on-surface-variant leading-[1.8] max-w-2xl">
-                    {dentists[0].description}
+                    {mainDentist?.description}
                   </p>
-                  {dentists[0].qualifications && (
-                    <div className="mt-8">
-                      <h3 className="text-xs font-semibold text-primary uppercase tracking-[0.15em] mb-4">
-                        Werdegang
-                      </h3>
-                      <div className="space-y-3">
-                        {dentists[0].qualifications.map((q) => (
-                          <div
-                            key={q}
-                            className="flex items-start gap-3 text-sm text-on-surface-variant"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" />
-                            <span className="leading-relaxed">{q}</span>
-                          </div>
-                        ))}
+                  {mainDentist?.qualifications &&
+                    mainDentist.qualifications.length > 0 && (
+                      <div className="mt-8">
+                        <h3 className="text-xs font-semibold text-primary uppercase tracking-[0.15em] mb-4">
+                          Werdegang
+                        </h3>
+                        <div className="space-y-3">
+                          {mainDentist.qualifications.map((q) => (
+                            <div
+                              key={q}
+                              className="flex items-start gap-3 text-sm text-on-surface-variant"
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" />
+                              <span className="leading-relaxed">{q}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             </div>
@@ -94,7 +124,7 @@ export default function TeamPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <FadeIn>
             <h2 className="text-2xl lg:text-3xl font-bold text-primary mb-4">
-              {teamIntro.subheading}
+              {intro.subheading}
             </h2>
             <p className="text-base text-on-surface-variant mb-12 max-w-xl">
               Unser eingespieltes Team sorgt für eine professionelle und
@@ -107,11 +137,9 @@ export default function TeamPage() {
                 <div className="bg-card rounded-xl p-7 shadow-[0_20px_40px_rgba(16,59,92,0.04)] h-full">
                   <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-surface-container mb-5">
                     {member.image ? (
-                      <Image
-                        src={asset(member.image!)}
+                      <TeamImage
+                        src={member.image}
                         alt={member.name}
-                        width={400}
-                        height={533}
                         className="w-full h-full object-cover object-top"
                       />
                     ) : (

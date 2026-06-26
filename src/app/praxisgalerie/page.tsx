@@ -3,46 +3,40 @@ import Image from "next/image";
 import { pages } from "@content/pages";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { asset } from "@/lib/utils";
+import { getGallerySettings } from "@/lib/gallery-settings";
 
 export const metadata: Metadata = {
   title: pages.gallery.title,
   description: pages.gallery.metaDescription,
 };
 
-const galleryImages = [
-  {
-    src: "/images/gallery/eingang.jpeg",
-    alt: "Eingangsbereich der Zahnarztpraxis",
-    title: "Eingangsbereich",
-  },
-  {
-    src: "/images/gallery/wartezimmer.jpeg",
-    alt: "Wartezimmer",
-    title: "Wartezimmer",
-  },
-  {
-    src: "/images/gallery/behandlung-1.jpg",
-    alt: "Behandlungsraum",
-    title: "Behandlungsraum",
-  },
-  {
-    src: "/images/gallery/behandlung-2.jpg",
-    alt: "Behandlungsraum mit moderner Ausstattung",
-    title: "Moderne Ausstattung",
-  },
-  {
-    src: "/images/gallery/roentgen.jpeg",
-    alt: "Digitale Röntgentechnik",
-    title: "Digitales Röntgen",
-  },
-  {
-    src: "/images/gallery/ausstattung.png",
-    alt: "Praxisausstattung",
-    title: "Praxisausstattung",
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function PraxisgaleriePage() {
+function GalleryAsset({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+}) {
+  if (src.startsWith("data:")) {
+    return <img src={src} alt={alt} className={className} />;
+  }
+  return (
+    <Image
+      src={asset(src)}
+      alt={alt}
+      width={600}
+      height={450}
+      className={className}
+    />
+  );
+}
+
+export default async function PraxisgaleriePage() {
+  const { images } = await getGallerySettings();
   return (
     <>
       {/* Header */}
@@ -86,15 +80,13 @@ export default function PraxisgaleriePage() {
             </h2>
           </FadeIn>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {galleryImages.map((img, i) => (
+            {images.map((img, i) => (
               <FadeIn key={img.src} delay={i * 0.04}>
                 <div className="group bg-card rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(16,59,92,0.04)] hover:shadow-[0_20px_40px_rgba(16,59,92,0.1)] transition-all duration-500">
                   <div className="aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={asset(img.src)}
+                    <GalleryAsset
+                      src={img.src}
                       alt={img.alt}
-                      width={600}
-                      height={450}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   </div>
@@ -102,6 +94,11 @@ export default function PraxisgaleriePage() {
                     <h3 className="text-sm font-semibold text-primary">
                       {img.title}
                     </h3>
+                    {img.copy && (
+                      <p className="mt-2 text-sm text-on-surface-variant leading-relaxed">
+                        {img.copy}
+                      </p>
+                    )}
                   </div>
                 </div>
               </FadeIn>

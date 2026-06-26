@@ -13,6 +13,22 @@ import {
   addCustomVertretung,
   findVertretungById,
 } from "@/lib/vertretungen";
+import {
+  setTeamSettings,
+  type TeamSettings,
+} from "@/lib/team-settings";
+import {
+  setGallerySettings,
+  type GallerySettings,
+} from "@/lib/gallery-settings";
+import {
+  setServiceSettings,
+  type ServiceSettings,
+} from "@/lib/service-settings";
+import {
+  setEmergencySettings,
+  type EmergencySettings,
+} from "@/lib/emergency-settings";
 
 interface RowInput {
   vertretungId?: string;
@@ -33,6 +49,11 @@ export interface LoginState {
 }
 
 export interface VacationFormState {
+  error?: string;
+  success?: boolean;
+}
+
+export interface SettingsFormState {
   error?: string;
   success?: boolean;
 }
@@ -148,6 +169,7 @@ export async function createVacationAction(
 
   await addVacation({ start, end, replacements, note });
   revalidatePath("/admin");
+  revalidatePath("/admin/urlaubszeiten");
   revalidatePath("/urlaubszeiten");
   return { success: true };
 }
@@ -158,5 +180,104 @@ export async function deleteVacationAction(formData: FormData): Promise<void> {
   if (id) {
     await deleteVacation(id);
     revalidatePath("/admin");
+    revalidatePath("/admin/urlaubszeiten");
+    revalidatePath("/urlaubszeiten");
   }
+}
+
+function parsePayload<T>(formData: FormData): T | undefined {
+  try {
+    return JSON.parse(String(formData.get("payload") ?? "")) as T;
+  } catch {
+    return undefined;
+  }
+}
+
+function isAllowedAsset(value: string | undefined, kind: "image" | "document") {
+  if (!value) return true;
+  if (value.startsWith("/") || value.startsWith("https://")) return true;
+  if (kind === "image" && value.startsWith("data:image/")) return true;
+  if (kind === "document" && value.startsWith("data:application/pdf")) return true;
+  return false;
+}
+
+export async function updateTeamSettingsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  await requireAuth();
+  const payload = parsePayload<TeamSettings>(formData);
+  if (!payload) return { error: "Die Team-Daten konnten nicht gelesen werden." };
+  if (!payload.members?.every((member) => isAllowedAsset(member.image, "image"))) {
+    return { error: "Bitte nur Bilder oder sichere Bild-URLs verwenden." };
+  }
+
+  await setTeamSettings(payload);
+  revalidatePath("/admin");
+  revalidatePath("/admin/team");
+  revalidatePath("/team");
+  return { success: true };
+}
+
+export async function updateGallerySettingsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  await requireAuth();
+  const payload = parsePayload<GallerySettings>(formData);
+  if (!payload) {
+    return { error: "Die Galerie-Daten konnten nicht gelesen werden." };
+  }
+  if (!payload.images?.every((image) => isAllowedAsset(image.src, "image"))) {
+    return { error: "Bitte nur Bilder oder sichere Bild-URLs verwenden." };
+  }
+
+  await setGallerySettings(payload);
+  revalidatePath("/admin");
+  revalidatePath("/admin/praxisgalerie");
+  revalidatePath("/praxisgalerie");
+  return { success: true };
+}
+
+export async function updateServiceSettingsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  await requireAuth();
+  const payload = parsePayload<ServiceSettings>(formData);
+  if (!payload) {
+    return { error: "Die Leistungs-Daten konnten nicht gelesen werden." };
+  }
+  if (!payload.services?.every((service) => isAllowedAsset(service.image, "image"))) {
+    return { error: "Bitte nur Bilder oder sichere Bild-URLs verwenden." };
+  }
+
+  await setServiceSettings(payload);
+  revalidatePath("/admin");
+  revalidatePath("/admin/leistungen");
+  revalidatePath("/leistungen");
+  for (const service of payload.services ?? []) {
+    if (service.slug) revalidatePath(`/leistungen/${service.slug}`);
+  }
+  return { success: true };
+}
+
+export async function updateEmergencySettingsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  await requireAuth();
+  const payload = parsePayload<EmergencySettings>(formData);
+  if (!payload) {
+    return { error: "Die Notdienst-Daten konnten nicht gelesen werden." };
+  }
+  if (!isAllowedAsset(payload.documentUrl, "document")) {
+    return { error: "Bitte nur PDF-Dateien oder sichere Dokument-URLs verwenden." };
+  }
+
+  await setEmergencySettings(payload);
+  revalidatePath("/admin");
+  revalidatePath("/admin/notdienst");
+  revalidatePath("/notdienst");
+  return { success: true };
 }

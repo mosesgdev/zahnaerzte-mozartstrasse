@@ -102,11 +102,7 @@ export default function Footer() {
               Schnellzugriff
             </h4>
             <ul className="space-y-2.5">
-              {(navigation.main as { label: string; href: string }[])
-                .filter(
-                  (n) => !("children" in n) && n.href !== "/"
-                )
-                .map((n) => (
+              {navigation.quickLinks.map((n) => (
                   <li key={n.href}>
                     <Link
                       href={n.href}

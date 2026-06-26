@@ -2,7 +2,6 @@ import "server-only";
 
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { PDFParse } from "pdf-parse";
 import { parseEmergencyPdfText } from "@/lib/emergency-parser";
 import { setEmergencySettings } from "@/lib/emergency-settings";
 import { saveUpload } from "@/lib/uploads";
@@ -11,7 +10,9 @@ const SOURCE_URL =
   process.env.NOTDIENST_SOURCE_URL ||
   "https://www.xn--zahnrzte-lneburg-ynb25b.de/Notdienst/";
 
-function configurePdfWorker() {
+type PDFParseConstructor = typeof import("pdf-parse")["PDFParse"];
+
+function configurePdfWorker(PDFParse: PDFParseConstructor) {
   const worker = path.join(
     process.cwd(),
     "node_modules",
@@ -22,6 +23,67 @@ function configurePdfWorker() {
     "pdf.worker.mjs",
   );
   PDFParse.setWorker(pathToFileURL(worker).href);
+}
+
+function ensurePdfJsDomPolyfills() {
+  const globalObject = globalThis as typeof globalThis & {
+    DOMMatrix?: typeof DOMMatrix;
+    ImageData?: typeof ImageData;
+    Path2D?: typeof Path2D;
+  };
+
+  if (!globalObject.DOMMatrix) {
+    globalObject.DOMMatrix = class DOMMatrix {
+      a = 1;
+      b = 0;
+      c = 0;
+      d = 1;
+      e = 0;
+      f = 0;
+
+      multiplySelf() {
+        return this;
+      }
+
+      translateSelf() {
+        return this;
+      }
+
+      scaleSelf() {
+        return this;
+      }
+
+      rotateSelf() {
+        return this;
+      }
+
+      invertSelf() {
+        return this;
+      }
+
+      transformPoint(point?: DOMPointInit) {
+        return point ?? { x: 0, y: 0, z: 0, w: 1 };
+      }
+    } as typeof DOMMatrix;
+  }
+
+  if (!globalObject.ImageData) {
+    globalObject.ImageData = class ImageData {
+      data: Uint8ClampedArray;
+      width: number;
+      height: number;
+
+      constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        this.data = new Uint8ClampedArray(width * height * 4);
+      }
+    } as typeof ImageData;
+  }
+
+  if (!globalObject.Path2D) {
+    globalObject.Path2D = class Path2D {} as typeof Path2D;
+  }
 }
 
 function decodeHtml(value: string): string {
@@ -59,7 +121,9 @@ export function findEmergencyPdfUrl(html: string, baseUrl = SOURCE_URL): string 
 }
 
 export async function parseEmergencyPdfBytes(bytes: Buffer) {
-  configurePdfWorker();
+  ensurePdfJsDomPolyfills();
+  const { PDFParse } = await import("pdf-parse");
+  configurePdfWorker(PDFParse);
   const parser = new PDFParse({ data: bytes });
   try {
     const result = await parser.getText();

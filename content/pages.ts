@@ -164,11 +164,10 @@ export const navigation = {
         { label: "Urlaub & Vertretung", href: "/urlaubszeiten" },
       ],
     },
-    { label: "Notdienst", href: "/notdienst" },
     { label: "Anfahrt", href: "/anfahrt" },
     { label: "Kontakt", href: "/kontakt" },
   ],
-  utility: [],
+  utility: [{ label: "Notdienst", href: "/notdienst" }],
   quickLinks: [
     { label: "Notdienst", href: "/notdienst" },
     { label: "Urlaub & Vertretung", href: "/urlaubszeiten" },

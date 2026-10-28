@@ -29,6 +29,10 @@ import {
   setEmergencySettings,
   type EmergencySettings,
 } from "@/lib/emergency-settings";
+import {
+  setSiteSettings,
+  type SiteSettings,
+} from "@/lib/site-settings";
 
 interface RowInput {
   vertretungId?: string;
@@ -279,5 +283,29 @@ export async function updateEmergencySettingsAction(
   revalidatePath("/admin");
   revalidatePath("/admin/notdienst");
   revalidatePath("/notdienst");
+  return { success: true };
+}
+
+export async function updateSiteSettingsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  await requireAuth();
+  const payload = parsePayload<SiteSettings>(formData);
+  if (!payload) {
+    return { error: "Die Website-Einstellungen konnten nicht gelesen werden." };
+  }
+  if (
+    payload.ionosRedirectEnabled &&
+    !/^https?:\/\//i.test(payload.ionosUrl?.trim() ?? "")
+  ) {
+    return {
+      error: "Bitte eine gültige URL (mit https://) der IONOS-Seite angeben.",
+    };
+  }
+
+  await setSiteSettings(payload);
+  revalidatePath("/admin");
+  revalidatePath("/admin/website");
   return { success: true };
 }

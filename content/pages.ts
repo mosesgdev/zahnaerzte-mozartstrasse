@@ -143,7 +143,7 @@ export const navigation = {
           label: "Kinderzahnheilkunde",
           href: "/leistungen/kinderzahnheilkunde",
         },
-        { label: "Wurzelkanal", href: "/leistungen/wurzelkanal" },
+        { label: "Endodontie", href: "/leistungen/wurzelkanal" },
         { label: "Specials", href: "/leistungen/specials" },
       ],
     },

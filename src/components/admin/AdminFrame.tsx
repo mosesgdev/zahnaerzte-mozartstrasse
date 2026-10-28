@@ -3,6 +3,7 @@ import { logout } from "@/app/admin/actions";
 import {
   CalendarOff,
   FileText,
+  Globe,
   Images,
   LogOut,
   Stethoscope,
@@ -15,6 +16,7 @@ const adminNav = [
   { label: "Praxisgalerie", href: "/admin/praxisgalerie", icon: Images },
   { label: "Leistungen", href: "/admin/leistungen", icon: Stethoscope },
   { label: "Notdienst", href: "/admin/notdienst", icon: FileText },
+  { label: "Website-Modus", href: "/admin/website", icon: Globe },
 ];
 
 export function AdminFrame({

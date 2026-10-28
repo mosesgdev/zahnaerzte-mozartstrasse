@@ -135,7 +135,7 @@ export const services: Service[] = [
   },
   {
     slug: "wurzelkanal",
-    title: "Wurzelkanal-Behandlung",
+    title: "Endodontie",
     pageTitle: "Lasergestützte Endodontie",
     shortDescription:
       "Moderne Wurzelkanalbehandlung mit lasergestützter Technik.",
@@ -172,7 +172,7 @@ export const servicesOverview = {
     "Implantate",
     "Hochwertiger Zahnersatz",
     "Parodontitis-Behandlung",
-    "Wurzelkanaltherapie",
+    "Endodontie (Wurzelkanalbehandlung)",
     "Vollkeramische Restaurationen",
     "Ästhetische Zahnheilkunde",
     "Laserbehandlungen",

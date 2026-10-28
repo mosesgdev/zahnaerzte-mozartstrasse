@@ -102,7 +102,7 @@ export default async function ServiceDetailPage({
                   {service.content.map((paragraph, i) => (
                     <p
                       key={i}
-                      className="text-base text-on-surface-variant leading-[1.8]"
+                      className="text-base text-on-surface-variant leading-[1.8] whitespace-pre-line"
                     >
                       {paragraph}
                     </p>

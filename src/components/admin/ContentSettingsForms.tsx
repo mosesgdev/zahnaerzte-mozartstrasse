@@ -6,9 +6,11 @@ import {
   updateEmergencySettingsAction,
   updateGallerySettingsAction,
   updateServiceSettingsAction,
+  updateSiteSettingsAction,
   updateTeamSettingsAction,
   type SettingsFormState,
 } from "@/app/admin/actions";
+import type { SiteSettings } from "@/lib/site-settings";
 import type { EmergencySettings } from "@/lib/emergency-settings";
 import type { EmergencyEntry } from "@/lib/emergency-settings";
 import type { GallerySettings } from "@/lib/gallery-settings";
@@ -34,6 +36,19 @@ function linesToArray(value: string): string[] {
 
 function arrayToLines(value: string[] | undefined): string {
   return value?.join("\n") ?? "";
+}
+
+// Prose fields: each paragraph is separated by a blank line, so editors can
+// naturally start a new paragraph (Enter twice) and the spacing round-trips.
+function paragraphsToArray(value: string): string[] {
+  return value
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+}
+
+function arrayToParagraphs(value: string[] | undefined): string {
+  return value?.join("\n\n") ?? "";
 }
 
 function slugify(value: string): string {
@@ -884,17 +899,20 @@ export function ServiceSettingsForm({ initial }: { initial: ServiceSettings }) {
           </div>
           <div className="grid sm:grid-cols-2 gap-4 mt-4">
             <div>
-              <label className={labelClass}>Copy, ein Absatz pro Zeile</label>
+              <label className={labelClass}>Copy</label>
               <textarea
                 className={fieldClass}
-                rows={6}
-                value={arrayToLines(service.content)}
+                rows={8}
+                value={arrayToParagraphs(service.content)}
                 onChange={(event) =>
                   updateService(service.slug, {
-                    content: linesToArray(event.target.value),
+                    content: paragraphsToArray(event.target.value),
                   })
                 }
               />
+              <p className="mt-1.5 text-xs text-on-surface-variant/70">
+                Für einen neuen Absatz eine Leerzeile einfügen (zweimal Enter).
+              </p>
             </div>
             <div>
               <label className={labelClass}>Detailpunkte, eine Zeile pro Punkt</label>
@@ -1194,6 +1212,77 @@ export function EmergencySettingsForm({
       <Button type="submit" disabled={pending} className="gap-2 rounded-full">
         <Save className="w-4 h-4" />
         {pending ? "Speichern..." : "Notdienst speichern"}
+      </Button>
+    </form>
+  );
+}
+
+export function SiteSettingsForm({ initial }: { initial: SiteSettings }) {
+  const [state, action, pending] = useActionState(
+    updateSiteSettingsAction,
+    initialState,
+  );
+  const [settings, setSettings] = useState(initial);
+  const payload = useMemo(() => JSON.stringify(settings), [settings]);
+
+  return (
+    <form action={action} className="space-y-6">
+      <input type="hidden" name="payload" value={payload} />
+
+      <label className="flex items-start gap-3 rounded-xl bg-surface-container/60 p-5 cursor-pointer">
+        <input
+          type="checkbox"
+          className="mt-1 h-4 w-4"
+          checked={settings.ionosRedirectEnabled}
+          onChange={(event) =>
+            setSettings((current) => ({
+              ...current,
+              ionosRedirectEnabled: event.target.checked,
+            }))
+          }
+        />
+        <span>
+          <span className="block text-sm font-semibold text-foreground">
+            Ursprüngliche IONOS-Seite aktivieren
+          </span>
+          <span className="mt-1 block text-sm text-on-surface-variant">
+            Wenn aktiviert, werden alle Besucher automatisch auf die alte
+            IONOS/1&amp;1-Website weitergeleitet. Der Verwaltungsbereich
+            (/admin) bleibt weiterhin erreichbar, um den Modus wieder
+            auszuschalten.
+          </span>
+        </span>
+      </label>
+
+      <div>
+        <label className={labelClass}>URL der IONOS-Seite</label>
+        <input
+          className={fieldClass}
+          value={settings.ionosUrl}
+          onChange={(event) =>
+            setSettings((current) => ({
+              ...current,
+              ionosUrl: event.target.value,
+            }))
+          }
+          placeholder="https://www.zahnaerzte-mozartstrasse.de"
+        />
+        <p className="mt-1.5 text-xs text-on-surface-variant/70">
+          Vollständige Adresse inklusive https://. Weiterleitung nur, wenn sich
+          diese Adresse von der aktuellen Website unterscheidet.
+        </p>
+      </div>
+
+      {settings.ionosRedirectEnabled && (
+        <div className="rounded-xl bg-tertiary-fixed/20 px-5 py-3 text-sm text-tertiary">
+          Achtung: Die neue Website ist derzeit für Besucher deaktiviert.
+        </div>
+      )}
+
+      <ActionStatus state={state} />
+      <Button type="submit" disabled={pending} className="gap-2 rounded-full">
+        <Save className="w-4 h-4" />
+        {pending ? "Speichern..." : "Einstellungen speichern"}
       </Button>
     </form>
   );

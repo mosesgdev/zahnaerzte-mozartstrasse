@@ -4,6 +4,7 @@ import { AdminFrame } from "@/components/admin/AdminFrame";
 import {
   CalendarOff,
   FileText,
+  Globe,
   Images,
   Stethoscope,
   Users,
@@ -46,6 +47,13 @@ const sections = [
     href: "/admin/notdienst",
     description: "Notdienstseite und Download-Dokument verwalten.",
     icon: FileText,
+  },
+  {
+    title: "Website-Modus",
+    href: "/admin/website",
+    description:
+      "Bei Bedarf die ursprüngliche IONOS-Seite aktivieren.",
+    icon: Globe,
   },
 ];
 

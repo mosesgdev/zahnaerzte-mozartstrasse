@@ -90,7 +90,7 @@ export default async function TeamPage() {
                   <p className="text-base text-secondary font-medium mt-1">
                     {mainDentist?.role ?? ""}
                   </p>
-                  <p className="mt-6 text-base text-on-surface-variant leading-[1.8] max-w-2xl">
+                  <p className="mt-6 text-base text-on-surface-variant leading-[1.8] max-w-2xl whitespace-pre-line">
                     {mainDentist?.description}
                   </p>
                   {mainDentist?.qualifications &&
@@ -158,7 +158,7 @@ export default async function TeamPage() {
                     {member.role}
                   </p>
                   {member.description && (
-                    <p className="mt-3 text-sm text-on-surface-variant leading-relaxed">
+                    <p className="mt-3 text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">
                       {member.description}
                     </p>
                   )}

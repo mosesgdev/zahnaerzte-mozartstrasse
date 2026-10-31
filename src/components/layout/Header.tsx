@@ -41,10 +41,8 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-white/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(16,59,92,0.06)]"
-            : "bg-white/60 backdrop-blur-md"
+        className={`fixed top-0 inset-x-0 z-50 bg-surface/95 backdrop-blur-sm border-b transition-colors duration-200 ease-out ${
+          scrolled ? "border-border" : "border-transparent"
         }`}
       >
         <nav className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -74,32 +72,33 @@ export default function Header() {
                   >
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-1 px-3.5 py-2 text-[13px] font-medium transition-colors rounded-full ${
+                      className={`flex h-9 items-center gap-1 px-3 text-sm font-medium transition-colors duration-150 ease-out rounded-[8px] ${
                         desktopDropdown === item.label
-                          ? "bg-surface-low text-primary"
-                          : "text-foreground/70 hover:text-primary hover:bg-surface-low"
+                          ? "bg-surface-container text-primary"
+                          : "text-foreground/70 hover:text-primary hover:bg-surface-container"
                       }`}
                     >
                       {item.label}
                       <ChevronDown
-                        className={`w-3 h-3 transition-transform ${
+                        strokeWidth={1.5}
+                        className={`size-4 transition-transform duration-150 ease-out ${
                           desktopDropdown === item.label ? "rotate-180" : ""
                         }`}
                       />
                     </Link>
                     <div
-                      className={`absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-200 ${
+                      className={`absolute top-full left-1/2 -translate-x-1/2 pt-2 transition-[opacity,transform,visibility] duration-200 ease-out ${
                         desktopDropdown === item.label
                           ? "opacity-100 visible translate-y-0 pointer-events-auto"
-                          : "opacity-0 invisible -translate-y-2 pointer-events-none"
+                          : "opacity-0 invisible -translate-y-1 pointer-events-none"
                       }`}
                     >
-                      <div className="w-72 bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_20px_40px_rgba(16,59,92,0.12)] p-2.5">
+                      <div className="w-72 bg-card border border-border rounded-[12px] shadow-[0_8px_24px_rgba(0,0,0,0.06)] p-1">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
-                            className="block px-4 py-2.5 text-[13px] text-foreground/70 hover:text-primary hover:bg-surface-low rounded-lg transition-colors"
+                            className="flex h-9 items-center px-3 text-sm text-foreground/70 hover:text-primary hover:bg-surface-low rounded-[8px] transition-colors duration-150 ease-out"
                           >
                             {child.label}
                           </Link>
@@ -111,7 +110,7 @@ export default function Header() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="px-3.5 py-2 text-[13px] font-medium text-foreground/70 hover:text-primary transition-colors rounded-full hover:bg-surface-low"
+                    className="flex h-9 items-center px-3 text-sm font-medium text-foreground/70 hover:text-primary transition-colors duration-150 ease-out rounded-[8px] hover:bg-surface-container"
                   >
                     {item.label}
                   </Link>
@@ -125,35 +124,35 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="hidden md:inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-2 text-sm font-semibold text-secondary transition-colors hover:bg-secondary/15 hover:text-primary"
+                  className="hidden md:inline-flex h-9 items-center gap-2 rounded-[8px] px-3 text-sm font-medium text-secondary transition-colors duration-150 ease-out hover:bg-surface-container"
                 >
-                  <AlertCircle className="w-4 h-4" />
+                  <AlertCircle className="size-4" strokeWidth={1.5} />
                   {item.label}
                 </Link>
               ))}
               <a
                 href={phoneHref}
-                className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-primary to-primary-container rounded-full hover:shadow-[0_8px_24px_rgba(16,59,92,0.3)] transition-all duration-300"
+                className="hidden sm:flex h-9 items-center gap-2 px-4 text-sm font-medium text-primary-foreground bg-primary rounded-[8px] hover:bg-primary-container transition-[background-color,transform] duration-150 ease-out active:scale-[0.98]"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="size-4" strokeWidth={1.5} />
                 Anrufen
               </a>
               <a
                 href={phoneHref}
-                className="sm:hidden p-2 text-primary hover:text-tertiary transition-colors"
+                className="sm:hidden p-2 text-primary hover:text-tertiary transition-colors duration-150 ease-out"
                 aria-label="Anrufen"
               >
-                <Phone className="w-5 h-5" />
+                <Phone className="size-5" strokeWidth={1.5} />
               </a>
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="xl:hidden p-2 text-foreground hover:text-primary transition-colors"
+                className="xl:hidden p-2 text-foreground hover:text-primary transition-colors duration-150 ease-out"
                 aria-label={mobileOpen ? "Menü schließen" : "Menü öffnen"}
               >
                 {mobileOpen ? (
-                  <X className="w-6 h-6" />
+                  <X className="size-6" strokeWidth={1.5} />
                 ) : (
-                  <Menu className="w-6 h-6" />
+                  <Menu className="size-6" strokeWidth={1.5} />
                 )}
               </button>
             </div>
@@ -163,18 +162,18 @@ export default function Header() {
 
       {/* Mobile menu */}
       <div
-        className={`fixed inset-0 z-40 xl:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-40 xl:hidden transition-[opacity,visibility] duration-200 ease-out ${
           mobileOpen
             ? "opacity-100 visible"
             : "opacity-0 invisible pointer-events-none"
         }`}
       >
         <div
-          className="absolute inset-0 bg-primary/10 backdrop-blur-sm"
+          className="absolute inset-0 bg-foreground/10"
           onClick={() => setMobileOpen(false)}
         />
         <div
-          className={`absolute top-20 right-0 bottom-0 w-80 max-w-[calc(100%-2rem)] bg-white/95 backdrop-blur-xl shadow-[-20px_0_40px_rgba(16,59,92,0.1)] overflow-y-auto transition-transform duration-300 ${
+          className={`absolute top-20 right-0 bottom-0 w-80 max-w-[calc(100%-2rem)] bg-surface border-l border-border overflow-y-auto transition-transform duration-300 ease-out ${
             mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -184,10 +183,10 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="mb-3 flex items-center justify-between rounded-xl bg-secondary/10 px-4 py-3 text-base font-semibold text-secondary hover:bg-secondary/15 hover:text-primary transition-colors"
+                className="mb-4 flex items-center justify-between rounded-[10px] bg-surface-low px-4 py-3 text-base font-medium text-secondary hover:bg-surface-container transition-colors duration-150 ease-out"
               >
                 <span className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
+                  <AlertCircle className="size-4" strokeWidth={1.5} />
                   {item.label}
                 </span>
                 <span className="text-xs font-medium text-on-surface-variant">
@@ -204,28 +203,26 @@ export default function Header() {
                         mobileDropdown === item.label ? null : item.label,
                       )
                     }
-                    className="w-full flex items-center justify-between px-4 py-3 text-base font-medium text-foreground hover:text-primary rounded-xl hover:bg-surface-low transition-colors"
+                    aria-expanded={mobileDropdown === item.label}
+                    className="w-full flex items-center justify-between px-4 py-3 text-base font-medium text-foreground hover:text-primary rounded-[10px] hover:bg-surface-low transition-colors duration-150 ease-out"
                   >
                     {item.label}
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 ${
+                      strokeWidth={1.5}
+                      className={`size-4 transition-transform duration-150 ease-out ${
                         mobileDropdown === item.label ? "rotate-180" : ""
                       }`}
                     />
                   </button>
                   <div
-                    className={`overflow-hidden transition-all duration-300 ${
-                      mobileDropdown === item.label
-                        ? "max-h-[500px] opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
+                    hidden={mobileDropdown !== item.label}
                   >
                     <div className="ml-4 mt-1 space-y-0.5 pb-2">
                       {item.children[0]?.href !== item.href && (
                         <Link
                           href={item.href}
                           onClick={() => setMobileOpen(false)}
-                          className="block px-4 py-2.5 text-sm text-foreground/70 hover:text-primary rounded-lg hover:bg-surface-low transition-colors font-medium"
+                          className="block px-4 py-2 text-sm text-foreground/70 hover:text-primary rounded-[8px] hover:bg-surface-low transition-colors duration-150 ease-out font-medium"
                         >
                           Alle {item.label}
                         </Link>
@@ -235,7 +232,7 @@ export default function Header() {
                           key={child.href}
                           href={child.href}
                           onClick={() => setMobileOpen(false)}
-                          className="block px-4 py-2.5 text-sm text-foreground/70 hover:text-primary rounded-lg hover:bg-surface-low transition-colors"
+                          className="block px-4 py-2 text-sm text-foreground/70 hover:text-primary rounded-[8px] hover:bg-surface-low transition-colors duration-150 ease-out"
                         >
                           {child.label}
                         </Link>
@@ -248,7 +245,7 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-4 py-3 text-base font-medium text-foreground hover:text-primary rounded-xl hover:bg-surface-low transition-colors"
+                  className="block px-4 py-3 text-base font-medium text-foreground hover:text-primary rounded-[10px] hover:bg-surface-low transition-colors duration-150 ease-out"
                 >
                   {item.label}
                 </Link>
@@ -259,9 +256,9 @@ export default function Header() {
             <div className="pt-4 mt-4">
               <a
                 href={phoneHref}
-                className="flex items-center justify-center gap-2 w-full px-6 py-3.5 text-base font-semibold text-white bg-gradient-to-r from-primary to-primary-container rounded-full"
+                className="flex h-12 items-center justify-center gap-2 w-full px-6 text-base font-medium tabular-nums text-primary-foreground bg-primary rounded-[10px] hover:bg-primary-container transition-colors duration-150 ease-out"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="size-4" strokeWidth={1.5} />
                 {siteData.practice.phone}
               </a>
             </div>

@@ -123,6 +123,46 @@ export const pages: Record<string, PageData> = {
   },
 };
 
+/** UI copy of the start page. Facts come from site-data, team and services. */
+export const homeContent = {
+  hero: {
+    eyebrow: "Zahnarztpraxis Boris Shuk in Winsen (Luhe)",
+    heading: "Zahnmedizin aus der Hand eines Zahntechnikers",
+    text: "Boris Shuk hat zuerst Zahntechnik gelernt und dann Zahnmedizin studiert. Seit 2013 behandeln er und sein Team in der Mozartstraße 10, von der Prophylaxe bis zum Implantat und mit der Zeit, die Sie brauchen.",
+    primaryAction: "Termin vereinbaren",
+    secondaryAction: "Leistungen ansehen",
+    imageAlt: "Empfang der Praxis mit beleuchtetem Tresen und Blick ins Wartezimmer",
+    imageCaption: "Empfang, Mozartstraße 10",
+  },
+  welcome: {
+    heading: "Zahnarzt und Zahntechniker in einer Person",
+    paragraphs: [
+      "In unserer Praxis verbinden wir moderne Behandlungsmethoden mit persönlicher Zuwendung. Als Zahnarzt und Zahntechniker vereint Boris Shuk die Erfahrung aus beiden Berufen, für Ergebnisse, die funktionell und ästhetisch überzeugen.",
+      "Seit 2013 versorgen wir Patienten in Winsen (Luhe) mit individuellen Behandlungsplänen und evidenzbasierter Zahnmedizin.",
+    ],
+    facts: [
+      { value: "2013", label: "Praxiseröffnung in Winsen" },
+      { value: "{services}", label: "Leistungsbereiche" },
+      { value: "Laser", label: "und digitale Diagnostik" },
+      { value: "Barrierefrei", label: "Rollstuhlgerechter Zugang" },
+    ],
+  },
+  services: {
+    label: "Leistungen",
+    more: "Alle Leistungen",
+  },
+  team: {
+    label: "Team",
+    more: "Zum ganzen Team",
+  },
+  contact: {
+    heading: "Vereinbaren Sie Ihren Termin",
+    text: "Wir freuen uns auf Ihren Besuch. Rufen Sie uns an oder kommen Sie vorbei.",
+    hoursHeading: "Sprechzeiten",
+    directions: "Anfahrt",
+  },
+};
+
 export const navigation = {
   main: [
     {

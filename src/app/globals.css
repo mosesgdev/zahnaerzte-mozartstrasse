@@ -50,6 +50,9 @@
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
   --radius-full: 9999px;
+
+  /* One easing curve for all interface motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root {
@@ -68,13 +71,14 @@
   --tertiary-fixed: #c4e7ff;
 
   /* ── Surfaces ── */
-  --background: #f9f9fc;
-  --foreground: #1a1c1e;
-  --surface: #f9f9fc;
-  --surface-container-low: #f4f3f6;
-  --surface-container: #eeedf1;
-  --surface-container-high: #e8e7eb;
-  --surface-container-highest: #e2e1e5;
+  /* Warm neutral ramp: paper and white lacquer of the practice, not lavender */
+  --background: #f8f7f4;
+  --foreground: #1c1d1f;
+  --surface: #f8f7f4;
+  --surface-container-low: #f2f0eb;
+  --surface-container: #ebe8e2;
+  --surface-container-high: #e4e0d9;
+  --surface-container-highest: #dcd8d0;
   --surface-container-lowest: #ffffff;
 
   /* ── Content colors ── */
@@ -83,17 +87,17 @@
 
   /* ── Shadcn mappings ── */
   --card: #ffffff;
-  --card-foreground: #1a1c1e;
+  --card-foreground: #1c1d1f;
   --popover: #ffffff;
-  --popover-foreground: #1a1c1e;
-  --muted: #f4f3f6;
+  --popover-foreground: #1c1d1f;
+  --muted: #f2f0eb;
   --muted-foreground: #42474e;
-  --accent: #eeedf1;
-  --accent-foreground: #1a1c1e;
+  --accent: #ebe8e2;
+  --accent-foreground: #1c1d1f;
   --destructive: #ba1a1a;
   --error-container: #ffdad6;
-  --border: oklch(0.8 0 0 / 15%);
-  --input: #f4f3f6;
+  --border: rgb(28 29 31 / 8%);
+  --input: #f2f0eb;
   --ring: #103b5c;
 
   --radius: 0.75rem;

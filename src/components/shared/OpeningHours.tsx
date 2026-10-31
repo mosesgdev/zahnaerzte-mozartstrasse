@@ -49,6 +49,7 @@ export function OpeningHours({
               )}
             >
               {h.day}
+              {isToday && " "}
               {isToday && (
                 <span
                   className={cn(

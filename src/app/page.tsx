@@ -88,13 +88,13 @@ export default function Home() {
             {welcome.facts.map((f, i) => (
               <div
                 key={f.label}
-                className={`border-b border-border py-6 ${i % 2 === 0 ? "pr-6" : "pl-6"}`}
+                className={`flex flex-col-reverse border-b border-border py-6 ${i % 2 === 0 ? "pr-6" : "pl-6"}`}
               >
-                <dt className="text-2xl font-medium tabular-nums text-primary">
-                  {f.value.replace("{services}", String(services.length))}
-                </dt>
-                <dd className="mt-1 text-sm text-on-surface-variant">
+                <dt className="mt-1 text-sm text-on-surface-variant">
                   {f.label}
+                </dt>
+                <dd className="text-2xl font-medium tabular-nums text-primary">
+                  {f.value.replace("{services}", String(visibleServices.length))}
                 </dd>
               </div>
             ))}
@@ -115,7 +115,7 @@ export default function Home() {
             </p>
             <Link
               href="/leistungen"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
             >
               {homeContent.services.more}
               <ArrowRight {...icon} />
@@ -156,7 +156,7 @@ export default function Home() {
             </p>
             <Link
               href="/team"
-              className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
             >
               {homeContent.team.more}
               <ArrowRight {...icon} />
@@ -251,7 +251,7 @@ export default function Home() {
             </p>
             <a
               href={phoneHref}
-              className="mt-10 inline-flex h-12 items-center gap-2 rounded-[10px] bg-surface px-6 text-base font-medium tabular-nums text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-white active:scale-[0.98]"
+              className="mt-10 inline-flex h-12 items-center gap-2 rounded-[10px] bg-surface px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white text-base font-medium tabular-nums text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-white active:scale-[0.98]"
             >
               <Phone {...icon} />
               {siteData.practice.phone}
@@ -265,12 +265,12 @@ export default function Home() {
             <OpeningHours tone="dark" className="mt-4" />
             <Link
               href="/anfahrt"
-              className="mt-8 flex items-start gap-2 text-sm text-white/70 transition-colors duration-150 ease-out hover:text-white"
+              className="mt-6 flex min-h-11 items-center gap-2 text-sm text-white/70 transition-colors duration-150 ease-out hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <MapPin {...icon} />
               <span>
                 {street}, {zip} {city}
-                <span className="text-white/50"> · {contact.directions}</span>
+                <span className="text-white/70"> · {contact.directions}</span>
               </span>
             </Link>
           </div>

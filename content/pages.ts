@@ -128,7 +128,7 @@ export const homeContent = {
   hero: {
     eyebrow: "Zahnarztpraxis Boris Shuk in Winsen (Luhe)",
     heading: "Zahnmedizin aus der Hand eines Zahntechnikers",
-    text: "Boris Shuk hat zuerst Zahntechnik gelernt und dann Zahnmedizin studiert. Seit 2013 behandeln er und sein Team in der Mozartstraße 10, von der Prophylaxe bis zum Implantat und mit der Zeit, die Sie brauchen.",
+    text: "Boris Shuk hat zuerst Zahntechnik gelernt und dann Zahnmedizin studiert. Seit 2013 behandeln er und sein Team in Winsen (Luhe), von der Prophylaxe bis zum Implantat.",
     primaryAction: "Termin vereinbaren",
     secondaryAction: "Leistungen ansehen",
     imageAlt: "Empfang der Praxis mit beleuchtetem Tresen und Blick ins Wartezimmer",

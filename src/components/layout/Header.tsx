@@ -139,14 +139,14 @@ export default function Header() {
               </a>
               <a
                 href={phoneHref}
-                className="sm:hidden p-2 text-primary hover:text-tertiary transition-colors duration-150 ease-out"
+                className="sm:hidden p-3 text-primary hover:text-tertiary transition-colors duration-150 ease-out"
                 aria-label="Anrufen"
               >
                 <Phone className="size-5" strokeWidth={1.5} />
               </a>
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="xl:hidden p-2 text-foreground hover:text-primary transition-colors duration-150 ease-out"
+                className="xl:hidden p-2.5 text-foreground hover:text-primary transition-colors duration-150 ease-out"
                 aria-label={mobileOpen ? "Menü schließen" : "Menü öffnen"}
               >
                 {mobileOpen ? (
@@ -222,7 +222,7 @@ export default function Header() {
                         <Link
                           href={item.href}
                           onClick={() => setMobileOpen(false)}
-                          className="block px-4 py-2 text-sm text-foreground/70 hover:text-primary rounded-[8px] hover:bg-surface-low transition-colors duration-150 ease-out font-medium"
+                          className="block px-4 py-3 text-sm text-foreground/70 hover:text-primary rounded-[8px] hover:bg-surface-low transition-colors duration-150 ease-out font-medium"
                         >
                           Alle {item.label}
                         </Link>
@@ -232,7 +232,7 @@ export default function Header() {
                           key={child.href}
                           href={child.href}
                           onClick={() => setMobileOpen(false)}
-                          className="block px-4 py-2 text-sm text-foreground/70 hover:text-primary rounded-[8px] hover:bg-surface-low transition-colors duration-150 ease-out"
+                          className="block px-4 py-3 text-sm text-foreground/70 hover:text-primary rounded-[8px] hover:bg-surface-low transition-colors duration-150 ease-out"
                         >
                           {child.label}
                         </Link>

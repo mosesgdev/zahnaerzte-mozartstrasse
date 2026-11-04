@@ -63,3 +63,14 @@ export async function setJson(key: string, value: unknown): Promise<void> {
   await fs.mkdir(DATA_DIR, { recursive: true });
   await fs.writeFile(fileFor(key), JSON.stringify(value, null, 2), "utf8");
 }
+
+export async function deleteKey(key: string): Promise<void> {
+  const url = redisUrl();
+  if (url) {
+    const redis = await getRedis(url);
+    await redis.del(key);
+    return;
+  }
+
+  await fs.rm(fileFor(key), { force: true });
+}

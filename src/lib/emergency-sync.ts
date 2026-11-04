@@ -3,8 +3,16 @@ import "server-only";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseEmergencyPdfText } from "@/lib/emergency-parser";
-import { setEmergencySettings } from "@/lib/emergency-settings";
-import { saveUpload } from "@/lib/uploads";
+import {
+  getEmergencySettings,
+  setEmergencySettings,
+} from "@/lib/emergency-settings";
+import {
+  deleteUpload,
+  getUpload,
+  saveUpload,
+  uploadIdFromUrl,
+} from "@/lib/uploads";
 
 const SOURCE_URL =
   process.env.NOTDIENST_SOURCE_URL ||
@@ -149,11 +157,16 @@ export async function syncEmergencySettingsFromSource() {
   const bytes = Buffer.from(await pdfResponse.arrayBuffer());
   const parsed = await parseEmergencyPdfBytes(bytes);
   const documentName = filenameFromUrl(pdfUrl);
-  const upload = await saveUpload({
-    name: documentName,
-    mimeType: "application/pdf",
-    data: bytes.toString("base64"),
-  });
+  const data = bytes.toString("base64");
+
+  // Store the PDF only when it changed; the daily cron mostly sees the same plan.
+  const previous = await getEmergencySettings();
+  const previousId = uploadIdFromUrl(previous.documentUrl);
+  const previousUpload = previousId ? await getUpload(previousId) : undefined;
+  const unchanged = previousUpload?.data === data;
+  const upload = unchanged
+    ? previousUpload
+    : await saveUpload({ name: documentName, mimeType: "application/pdf", data });
 
   await setEmergencySettings({
     title: "Zahnärztlicher Notdienst",
@@ -176,6 +189,11 @@ export async function syncEmergencySettingsFromSource() {
     lastSyncedAt: new Date().toISOString(),
     entries: parsed.entries,
   });
+
+  // The replaced plan PDF is no longer linked anywhere.
+  if (!unchanged && previousId) {
+    await deleteUpload(previousId);
+  }
 
   return {
     sourceUrl: SOURCE_URL,

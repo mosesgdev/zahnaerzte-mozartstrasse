@@ -134,9 +134,9 @@ export function VacationForm({ vertretungen }: { vertretungen: Vertretung[] }) {
                     type="button"
                     onClick={() => removeRow(row.key)}
                     aria-label="Vertretung entfernen"
-                    className="inline-flex items-center justify-center w-7 h-7 rounded-md text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                    className="inline-flex items-center justify-center w-11 h-11 rounded-lg text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -245,7 +245,7 @@ export function VacationForm({ vertretungen }: { vertretungen: Vertretung[] }) {
         <button
           type="button"
           onClick={addRow}
-          className="inline-flex items-center gap-2 text-sm font-medium text-secondary hover:text-primary transition-colors"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-secondary/10 px-5 text-base font-semibold text-secondary hover:bg-secondary/15 hover:text-primary transition-colors"
         >
           <Plus className="w-4 h-4" />
           Weitere Vertretung hinzufügen
@@ -266,14 +266,19 @@ export function VacationForm({ vertretungen }: { vertretungen: Vertretung[] }) {
         />
       </div>
 
-      {state.error && (
-        <p className="text-sm text-destructive font-medium">{state.error}</p>
-      )}
-      {state.success && (
-        <p className="text-sm text-secondary font-medium">
-          Urlaubszeit gespeichert.
-        </p>
-      )}
+      <div aria-live="polite">
+        {state.error && (
+          <p role="alert" className="text-sm text-destructive font-medium">
+            Nicht gespeichert: {state.error}
+          </p>
+        )}
+        {state.success && (
+          <p className="text-sm text-secondary font-medium">
+            Urlaubszeit gespeichert. Sie steht jetzt auf der Seite „Urlaub &
+            Vertretung“.
+          </p>
+        )}
+      </div>
 
       <Button
         type="submit"

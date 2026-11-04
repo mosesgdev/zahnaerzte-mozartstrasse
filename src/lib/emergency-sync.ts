@@ -3,7 +3,10 @@ import "server-only";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseEmergencyPdfText } from "@/lib/emergency-parser";
-import { setEmergencySettings } from "@/lib/emergency-settings";
+import {
+  getEmergencySettings,
+  setEmergencySettings,
+} from "@/lib/emergency-settings";
 import { saveUpload } from "@/lib/uploads";
 
 const SOURCE_URL =
@@ -155,21 +158,10 @@ export async function syncEmergencySettingsFromSource() {
     data: bytes.toString("base64"),
   });
 
+  // Only replace the plan itself; texts edited in the admin stay untouched.
+  const current = await getEmergencySettings();
   await setEmergencySettings({
-    title: "Zahnärztlicher Notdienst",
-    intro:
-      "Sollten Sie einen akuten zahnmedizinischen Notfall am Wochenende oder Feiertag haben, wenden Sie sich bitte zuerst telefonisch an die aufgeführten Praxen. So können Therapiebedarf und Wartezeit besser koordiniert werden.",
-    nonEmergencyItems: [
-      "die herausgefallene Füllung",
-      "eine Druckstelle einer Prothese",
-      "zerbrochener Zahnersatz",
-      "das herausgefallene Provisorium",
-      "die herausgefallene Krone",
-      "die Entfernung von Nähten",
-    ],
-    consultationText:
-      "Die Notdienstsprechstunde findet an den jeweiligen Tagen am Vormittag in der Zeit von 10 bis 12 Uhr statt. Außerhalb dieser Zeit besteht eine Rufbereitschaft.",
-    documentLabel: "Notdienstplan herunterladen",
+    ...current,
     documentUrl: `/uploads/admin/${upload.id}`,
     documentName,
     documentText: parsed.documentText,

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getJson, setJson } from "@/lib/kv";
+import { normalizeText } from "@/lib/text";
 
 export interface GalleryImage {
   id: string;
@@ -67,7 +68,7 @@ function normalize(settings: GallerySettings): GallerySettings {
             src: image.src.trim(),
             alt: image.alt?.trim() || image.title.trim(),
             title: image.title.trim(),
-            copy: image.copy?.trim() || undefined,
+            copy: normalizeText(image.copy) || undefined,
           }))
       : fallbackGallerySettings.images,
   };

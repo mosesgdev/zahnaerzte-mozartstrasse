@@ -4,6 +4,7 @@ import { getAllVertretungen } from "@/lib/vertretungen";
 import { deleteVacationAction } from "@/app/admin/actions";
 import { AdminFrame } from "@/components/admin/AdminFrame";
 import { VacationForm } from "@/components/admin/VacationForm";
+import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { CalendarOff, MapPin, Phone, Plus, Trash2 } from "lucide-react";
 
 export const metadata = {
@@ -27,8 +28,13 @@ export default async function AdminUrlaubszeitenPage() {
   ]);
 
   return (
-    <AdminFrame title="Urlaubszeiten" width="max-w-3xl">
-      <div className="bg-card rounded-2xl p-7 lg:p-9 shadow-[0_20px_50px_rgba(16,59,92,0.06)] mb-12">
+    <AdminFrame
+      title="Urlaub & Vertretung"
+      area="urlaubszeiten"
+      intro="Tragen Sie ein, wann die Praxis geschlossen ist und welche Praxis Sie vertritt. Vergangene Zeiträume verschwinden automatisch von der Website."
+      width="max-w-3xl"
+    >
+      <div className="bg-card rounded-2xl p-4 sm:p-6 lg:p-9 shadow-[0_20px_50px_rgba(16,59,92,0.06)] mb-12">
         <h2 className="flex items-center gap-2.5 text-xl font-bold text-primary mb-6">
           <Plus className="w-5 h-5 text-secondary" />
           Neue Urlaubszeit
@@ -92,13 +98,13 @@ export default async function AdminUrlaubszeitenPage() {
 
               <form action={deleteVacationAction}>
                 <input type="hidden" name="id" value={v.id} />
-                <button
-                  type="submit"
+                <ConfirmSubmitButton
+                  question={`Urlaubszeit ${formatDate(v.start)} – ${formatDate(v.end)} wirklich löschen?`}
                   aria-label="Urlaubszeit löschen"
-                  className="inline-flex items-center justify-center w-9 h-9 rounded-lg text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors shrink-0"
+                  className="inline-flex items-center justify-center w-11 h-11 rounded-lg text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors shrink-0"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </ConfirmSubmitButton>
               </form>
             </li>
           ))}

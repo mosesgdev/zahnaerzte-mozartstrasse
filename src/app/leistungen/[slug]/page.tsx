@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { services } from "@content/services";
 import { getServiceSettings } from "@/lib/service-settings";
+import { RichText } from "@/components/shared/RichText";
 import { siteData } from "@content/site-data";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { ArrowLeft, ArrowRight, Phone, Check } from "lucide-react";
@@ -38,7 +39,12 @@ export default async function ServiceDetailPage({
   const { slug } = await params;
   const { services } = await getServiceSettings();
   const service = services.find((s) => s.slug === slug);
-  if (!service) notFound();
+  if (!service) {
+    // Old links keep working after the URL of a service was changed.
+    const renamed = services.find((s) => s.previousSlugs?.includes(slug));
+    if (renamed) permanentRedirect(`/leistungen/${renamed.slug}`);
+    notFound();
+  }
 
   const currentIndex = services.findIndex((s) => s.slug === slug);
   const prevService = currentIndex > 0 ? services[currentIndex - 1] : null;
@@ -99,14 +105,11 @@ export default async function ServiceDetailPage({
                       )}
                     </div>
                   )}
-                  {service.content.map((paragraph, i) => (
-                    <p
-                      key={i}
-                      className="text-base text-on-surface-variant leading-[1.8]"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
+                  <RichText
+                    text={service.content}
+                    className="space-y-5"
+                    paragraphClassName="text-base text-on-surface-variant leading-[1.8]"
+                  />
                 </div>
               </FadeIn>
 

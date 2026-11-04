@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { siteData } from "@content/site-data";
-import { services, servicesOverview } from "@content/services";
-import { dentists, assistants, teamIntro } from "@content/team";
+import { getServiceSettings } from "@/lib/service-settings";
+import { getTeamSettings } from "@/lib/team-settings";
+import { RichText } from "@/components/shared/RichText";
 import { homeContent } from "@content/pages";
 import { OpeningHours } from "@/components/shared/OpeningHours";
 import { Phone, ArrowRight, MapPin } from "lucide-react";
@@ -14,7 +15,11 @@ const sectionLabel = "text-sm font-medium text-secondary";
 const sectionHeading =
   "text-3xl lg:text-[2.5rem] font-medium text-primary leading-[1.15] tracking-[-0.02em] text-balance";
 
-export default function Home() {
+export default async function Home() {
+  const [{ services, overview: servicesOverview }, { intro: teamIntro, members }] =
+    await Promise.all([getServiceSettings(), getTeamSettings()]);
+  const dentists = members.filter((m) => m.group === "dentists");
+  const assistants = members.filter((m) => m.group === "assistants");
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
   const { hero, welcome, contact } = homeContent;
   const owner = dentists[0];
@@ -110,9 +115,11 @@ export default function Home() {
             <h2 className={`mt-4 ${sectionHeading}`}>
               {servicesOverview.heading}
             </h2>
-            <p className="mt-6 text-base leading-[1.75] text-on-surface-variant">
-              {servicesOverview.anxiousPatients}
-            </p>
+            <RichText
+              text={servicesOverview.anxiousPatients}
+              className="mt-6 space-y-4"
+              paragraphClassName="text-base leading-[1.75] text-on-surface-variant"
+            />
             <Link
               href="/leistungen"
               className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
@@ -151,9 +158,11 @@ export default function Home() {
           <div className="lg:col-span-4">
             <p className={sectionLabel}>{homeContent.team.label}</p>
             <h2 className={`mt-4 ${sectionHeading}`}>{teamIntro.heading}</h2>
-            <p className="mt-6 text-base leading-[1.75] text-on-surface-variant">
-              {teamIntro.text}
-            </p>
+            <RichText
+              text={teamIntro.text}
+              className="mt-6 space-y-4"
+              paragraphClassName="text-base leading-[1.75] text-on-surface-variant"
+            />
             <Link
               href="/team"
               className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
@@ -164,50 +173,54 @@ export default function Home() {
           </div>
 
           <div className="space-y-4 lg:col-span-8">
-            <article className="rounded-lg bg-card p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)] sm:p-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
-                <div className="relative h-40 w-32 shrink-0 overflow-hidden rounded-[8px] bg-surface-container">
-                  {owner.image && (
-                    <Image
-                      src={asset(owner.image)}
-                      alt={owner.name}
-                      fill
-                      sizes="128px"
-                      className="object-cover object-top"
+            {owner && (
+              <article className="rounded-lg bg-card p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)] sm:p-8">
+                <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
+                  <div className="relative h-40 w-32 shrink-0 overflow-hidden rounded-[8px] bg-surface-container">
+                    {owner.image && (
+                      <Image
+                        src={asset(owner.image)}
+                        alt={owner.name}
+                        fill
+                        sizes="128px"
+                        className="object-cover object-top"
+                      />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-medium text-primary">
+                      {owner.name}
+                    </h3>
+                    <p className="mt-1 text-sm text-on-surface-variant">
+                      {owner.role}
+                    </p>
+                    <RichText
+                      text={owner.description}
+                      className="mt-4 space-y-3"
+                      paragraphClassName="text-sm leading-relaxed text-on-surface-variant"
                     />
-                  )}
+                    {owner.qualifications && (
+                      <dl className="mt-6 border-t border-border text-sm">
+                        {owner.qualifications.map((q) => {
+                          const [label, years] = q.split(": ");
+                          return (
+                            <div
+                              key={q}
+                              className="flex justify-between gap-4 border-b border-border py-2"
+                            >
+                              <dt className="text-foreground/80">{label}</dt>
+                              <dd className="shrink-0 tabular-nums text-on-surface-variant">
+                                {years}
+                              </dd>
+                            </div>
+                          );
+                        })}
+                      </dl>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-medium text-primary">
-                    {owner.name}
-                  </h3>
-                  <p className="mt-1 text-sm text-on-surface-variant">
-                    {owner.role}
-                  </p>
-                  <p className="mt-4 text-sm leading-relaxed text-on-surface-variant">
-                    {owner.description}
-                  </p>
-                  {owner.qualifications && (
-                    <dl className="mt-6 border-t border-border text-sm">
-                      {owner.qualifications.map((q) => {
-                        const [label, years] = q.split(": ");
-                        return (
-                          <div
-                            key={q}
-                            className="flex justify-between gap-4 border-b border-border py-2"
-                          >
-                            <dt className="text-foreground/80">{label}</dt>
-                            <dd className="shrink-0 tabular-nums text-on-surface-variant">
-                              {years}
-                            </dd>
-                          </div>
-                        );
-                      })}
-                    </dl>
-                  )}
-                </div>
-              </div>
-            </article>
+              </article>
+            )}
 
             <ul className="grid gap-4 sm:grid-cols-3">
               {assistants.slice(0, 3).map((a) => (

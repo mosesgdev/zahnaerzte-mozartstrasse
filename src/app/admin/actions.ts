@@ -29,6 +29,8 @@ import {
   setEmergencySettings,
   type EmergencySettings,
 } from "@/lib/emergency-settings";
+import { markUpdated, type AdminArea } from "@/lib/admin-meta";
+import { slugify } from "@/lib/text";
 
 interface RowInput {
   vertretungId?: string;
@@ -56,6 +58,19 @@ export interface VacationFormState {
 export interface SettingsFormState {
   error?: string;
   success?: boolean;
+  /** Time of the last successful save, so repeated saves re-announce. */
+  savedAt?: string;
+}
+
+/**
+ * Public pages read the settings at render time; the layout (menu) does too.
+ * Revalidating the root layout refreshes every page, so changes show up
+ * immediately — cheap for a site of this size.
+ */
+async function afterSave(area: AdminArea): Promise<SettingsFormState> {
+  await markUpdated(area);
+  revalidatePath("/", "layout");
+  return { success: true, savedAt: new Date().toISOString() };
 }
 
 function passwordMatches(input: string): boolean {
@@ -168,9 +183,8 @@ export async function createVacationAction(
   }
 
   await addVacation({ start, end, replacements, note });
-  revalidatePath("/admin");
-  revalidatePath("/admin/urlaubszeiten");
-  revalidatePath("/urlaubszeiten");
+  await markUpdated("urlaubszeiten");
+  revalidatePath("/", "layout");
   return { success: true };
 }
 
@@ -179,9 +193,8 @@ export async function deleteVacationAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
   if (id) {
     await deleteVacation(id);
-    revalidatePath("/admin");
-    revalidatePath("/admin/urlaubszeiten");
-    revalidatePath("/urlaubszeiten");
+    await markUpdated("urlaubszeiten");
+    revalidatePath("/", "layout");
   }
 }
 
@@ -208,15 +221,24 @@ export async function updateTeamSettingsAction(
   await requireAuth();
   const payload = parsePayload<TeamSettings>(formData);
   if (!payload) return { error: "Die Team-Daten konnten nicht gelesen werden." };
-  if (!payload.members?.every((member) => isAllowedAsset(member.image, "image"))) {
-    return { error: "Bitte nur Bilder oder sichere Bild-URLs verwenden." };
+  if (!Array.isArray(payload.members)) {
+    return { error: "Die Team-Daten konnten nicht gelesen werden." };
+  }
+  const incomplete = payload.members.findIndex(
+    (member) => !member.name?.trim() || !member.role?.trim(),
+  );
+  if (incomplete >= 0) {
+    const name = payload.members[incomplete].name?.trim();
+    return {
+      error: `Nicht gespeichert: Bitte bei ${name ? `„${name}“` : `Person ${incomplete + 1}`} Name und Funktion ausfüllen.`,
+    };
+  }
+  if (!payload.members.every((member) => isAllowedAsset(member.image, "image"))) {
+    return { error: "Nicht gespeichert: Ein Foto hat eine ungültige Adresse. Bitte das Foto neu hochladen." };
   }
 
   await setTeamSettings(payload);
-  revalidatePath("/admin");
-  revalidatePath("/admin/team");
-  revalidatePath("/team");
-  return { success: true };
+  return afterSave("team");
 }
 
 export async function updateGallerySettingsAction(
@@ -228,15 +250,27 @@ export async function updateGallerySettingsAction(
   if (!payload) {
     return { error: "Die Galerie-Daten konnten nicht gelesen werden." };
   }
-  if (!payload.images?.every((image) => isAllowedAsset(image.src, "image"))) {
-    return { error: "Bitte nur Bilder oder sichere Bild-URLs verwenden." };
+  if (!Array.isArray(payload.images)) {
+    return { error: "Die Galerie-Daten konnten nicht gelesen werden." };
+  }
+  const missingImage = payload.images.findIndex((image) => !image.src?.trim());
+  if (missingImage >= 0) {
+    return {
+      error: `Nicht gespeichert: Bei Bild ${missingImage + 1} fehlt noch die Bilddatei. Bitte ein Bild hochladen oder den Eintrag entfernen.`,
+    };
+  }
+  const missingTitle = payload.images.findIndex((image) => !image.title?.trim());
+  if (missingTitle >= 0) {
+    return {
+      error: `Nicht gespeichert: Bitte bei Bild ${missingTitle + 1} einen Titel eintragen.`,
+    };
+  }
+  if (!payload.images.every((image) => isAllowedAsset(image.src, "image"))) {
+    return { error: "Nicht gespeichert: Ein Bild hat eine ungültige Adresse. Bitte das Bild neu hochladen." };
   }
 
   await setGallerySettings(payload);
-  revalidatePath("/admin");
-  revalidatePath("/admin/praxisgalerie");
-  revalidatePath("/praxisgalerie");
-  return { success: true };
+  return afterSave("praxisgalerie");
 }
 
 export async function updateServiceSettingsAction(
@@ -248,18 +282,32 @@ export async function updateServiceSettingsAction(
   if (!payload) {
     return { error: "Die Leistungs-Daten konnten nicht gelesen werden." };
   }
-  if (!payload.services?.every((service) => isAllowedAsset(service.image, "image"))) {
-    return { error: "Bitte nur Bilder oder sichere Bild-URLs verwenden." };
+  if (!Array.isArray(payload.services)) {
+    return { error: "Die Leistungs-Daten konnten nicht gelesen werden." };
+  }
+  const untitled = payload.services.findIndex((service) => !service.title?.trim());
+  if (untitled >= 0) {
+    return {
+      error: `Nicht gespeichert: Bitte bei Leistung ${untitled + 1} einen Namen eintragen.`,
+    };
+  }
+  const seen = new Map<string, string>();
+  for (const service of payload.services) {
+    const slug = slugify(service.slug?.trim() || "") || slugify(service.title);
+    const other = seen.get(slug);
+    if (other) {
+      return {
+        error: `Nicht gespeichert: „${other}“ und „${service.title.trim()}“ haben dieselbe Webadresse (/leistungen/${slug}). Bitte bei einer der beiden unter „Weitere Einstellungen“ eine andere Webadresse eintragen.`,
+      };
+    }
+    seen.set(slug, service.title.trim());
+  }
+  if (!payload.services.every((service) => isAllowedAsset(service.image, "image"))) {
+    return { error: "Nicht gespeichert: Ein Bild hat eine ungültige Adresse. Bitte das Bild neu hochladen." };
   }
 
   await setServiceSettings(payload);
-  revalidatePath("/admin");
-  revalidatePath("/admin/leistungen");
-  revalidatePath("/leistungen");
-  for (const service of payload.services ?? []) {
-    if (service.slug) revalidatePath(`/leistungen/${service.slug}`);
-  }
-  return { success: true };
+  return afterSave("leistungen");
 }
 
 export async function updateEmergencySettingsAction(
@@ -272,12 +320,9 @@ export async function updateEmergencySettingsAction(
     return { error: "Die Notdienst-Daten konnten nicht gelesen werden." };
   }
   if (!isAllowedAsset(payload.documentUrl, "document")) {
-    return { error: "Bitte nur PDF-Dateien oder sichere Dokument-URLs verwenden." };
+    return { error: "Nicht gespeichert: Bitte nur PDF-Dateien hochladen." };
   }
 
   await setEmergencySettings(payload);
-  revalidatePath("/admin");
-  revalidatePath("/admin/notdienst");
-  revalidatePath("/notdienst");
-  return { success: true };
+  return afterSave("notdienst");
 }

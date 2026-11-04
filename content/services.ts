@@ -1,12 +1,16 @@
 export interface Service {
   slug: string;
   title: string;
+  /** Optional shorter name for the navigation menu (falls back to title). */
+  menuLabel?: string;
   pageTitle: string;
   shortDescription: string;
   image?: string;
   content: string[];
   bulletPoints?: string[];
   underConstruction?: boolean;
+  /** Former slugs that redirect to the current one after a URL change. */
+  previousSlugs?: string[];
 }
 
 export const services: Service[] = [
@@ -32,6 +36,7 @@ export const services: Service[] = [
   {
     slug: "parodontitis",
     title: "Parodontitis-Behandlung",
+    menuLabel: "Parodontitis",
     pageTitle:
       "Parodontitis, eine schleichende Entzündung, die oft zu spät erkannt wird",
     shortDescription:
@@ -62,6 +67,7 @@ export const services: Service[] = [
   {
     slug: "vollkeramik",
     title: "Vollkeramische Restaurationen",
+    menuLabel: "Vollkeramik",
     pageTitle: "Keramik – Ästhetik in Perfektion",
     shortDescription:
       "Vollkeramische Inlays, Kronen und Brücken für perfekte Ästhetik.",
@@ -91,6 +97,7 @@ export const services: Service[] = [
   {
     slug: "zahnersatz",
     title: "Hochwertiger Zahnersatz",
+    menuLabel: "Zahnersatz",
     pageTitle: "Hochwertiger Zahnersatz – langlebig und elegant",
     shortDescription:
       "Moderner Zahnersatz mit zeitgemäßen Materialien und Methoden.",
@@ -136,6 +143,7 @@ export const services: Service[] = [
   {
     slug: "wurzelkanal",
     title: "Wurzelkanal-Behandlung",
+    menuLabel: "Wurzelkanal",
     pageTitle: "Lasergestützte Endodontie",
     shortDescription:
       "Moderne Wurzelkanalbehandlung mit lasergestützter Technik.",

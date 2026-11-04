@@ -127,7 +127,7 @@ export const pages: Record<string, PageData> = {
 export const homeContent = {
   hero: {
     eyebrow: "Zahnarztpraxis Boris Shuk in Winsen (Luhe)",
-    heading: "Zahnmedizin aus der Hand eines Zahntechnikers",
+    heading: "Ihr Zahnarzt in Winsen (Luhe)",
     text: "Boris Shuk hat zuerst Zahntechnik gelernt und dann Zahnmedizin studiert. Seit 2013 behandeln er und sein Team in Winsen (Luhe), von der Prophylaxe bis zum Implantat.",
     primaryAction: "Termin vereinbaren",
     secondaryAction: "Leistungen ansehen",

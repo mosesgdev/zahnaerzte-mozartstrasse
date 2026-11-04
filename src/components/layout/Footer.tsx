@@ -3,6 +3,7 @@ import { siteData } from "@content/site-data";
 import { navigation } from "@content/pages";
 import { services } from "@content/services";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { OpeningHours } from "@/components/shared/OpeningHours";
 
 export default function Footer() {
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
@@ -13,18 +14,18 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Practice info */}
           <div>
-            <h3 className="text-lg font-bold text-primary mb-1">
+            <h3 className="text-lg font-medium text-primary mb-1">
               {siteData.practice.shortName}
             </h3>
-            <p className="text-sm text-on-surface-variant leading-relaxed mb-5">
+            <p className="text-sm text-on-surface-variant leading-relaxed mb-6">
               {siteData.practice.name}
             </p>
             <div className="space-y-3">
               <Link
                 href="/anfahrt"
-                className="flex items-start gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
+                className="flex items-start gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
               >
-                <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
+                <MapPin className="size-4 shrink-0 mt-0.5" strokeWidth={1.5} />
                 <span>
                   {siteData.practice.address.street}
                   <br />
@@ -34,16 +35,16 @@ export default function Footer() {
               </Link>
               <a
                 href={phoneHref}
-                className="flex items-center gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
               >
-                <Phone className="w-4 h-4 shrink-0" />
+                <Phone className="size-4 shrink-0" strokeWidth={1.5} />
                 {siteData.practice.phone}
               </a>
               <a
                 href={`mailto:${siteData.practice.email}`}
-                className="flex items-center gap-2.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
               >
-                <Mail className="w-4 h-4 shrink-0" />
+                <Mail className="size-4 shrink-0" strokeWidth={1.5} />
                 {siteData.practice.email}
               </a>
             </div>
@@ -51,15 +52,15 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-xs font-semibold text-primary uppercase tracking-[0.15em] mb-5">
+            <h4 className="text-sm font-medium text-primary mb-4">
               Leistungen
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2">
               {services.slice(0, 7).map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/leistungen/${s.slug}`}
-                    className="text-sm text-on-surface-variant hover:text-primary transition-colors"
+                    className="text-sm text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
                   >
                     {s.title}
                   </Link>
@@ -68,7 +69,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/leistungen"
-                  className="text-sm font-medium text-secondary hover:text-primary transition-colors"
+                  className="text-sm font-medium text-secondary hover:text-primary transition-colors duration-150 ease-out"
                 >
                   Alle Leistungen →
                 </Link>
@@ -78,35 +79,23 @@ export default function Footer() {
 
           {/* Hours */}
           <div>
-            <h4 className="text-xs font-semibold text-primary uppercase tracking-[0.15em] mb-5">
+            <h4 className="text-sm font-medium text-primary mb-4">
               Sprechzeiten
             </h4>
-            <ul className="space-y-2.5">
-              {siteData.openingHours.map((h) => (
-                <li
-                  key={h.day}
-                  className="flex justify-between text-sm text-on-surface-variant gap-4"
-                >
-                  <span className="font-medium text-foreground/80">
-                    {h.day}
-                  </span>
-                  <span className="tabular-nums">{h.hours}</span>
-                </li>
-              ))}
-            </ul>
+            <OpeningHours className="-my-2" />
           </div>
 
           {/* Quick links */}
           <div>
-            <h4 className="text-xs font-semibold text-primary uppercase tracking-[0.15em] mb-5">
+            <h4 className="text-sm font-medium text-primary mb-4">
               Schnellzugriff
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2">
               {navigation.quickLinks.map((n) => (
                   <li key={n.href}>
                     <Link
                       href={n.href}
-                      className="text-sm text-on-surface-variant hover:text-primary transition-colors"
+                      className="text-sm text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
                     >
                       {n.label}
                     </Link>
@@ -128,7 +117,7 @@ export default function Footer() {
               <Link
                 key={n.href}
                 href={n.href}
-                className="text-xs text-on-surface-variant hover:text-primary transition-colors"
+                className="text-xs text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
               >
                 {n.label}
               </Link>

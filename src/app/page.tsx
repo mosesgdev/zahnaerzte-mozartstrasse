@@ -3,354 +3,276 @@ import Image from "next/image";
 import { siteData } from "@content/site-data";
 import { services, servicesOverview } from "@content/services";
 import { dentists, assistants, teamIntro } from "@content/team";
-import { FadeIn } from "@/components/shared/FadeIn";
-import {
-  Phone,
-  ArrowRight,
-  MapPin,
-  Clock,
-  Shield,
-  Star,
-  Sparkles,
-  Heart,
-} from "lucide-react";
+import { homeContent } from "@content/pages";
+import { OpeningHours } from "@/components/shared/OpeningHours";
+import { Phone, ArrowRight, MapPin } from "lucide-react";
 import { asset } from "@/lib/utils";
+
+const icon = { className: "size-4.5 shrink-0", strokeWidth: 1.5 } as const;
+
+const sectionLabel = "text-sm font-medium text-secondary";
+const sectionHeading =
+  "text-3xl lg:text-[2.5rem] font-medium text-primary leading-[1.15] tracking-[-0.02em] text-balance";
 
 export default function Home() {
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
+  const { hero, welcome, contact } = homeContent;
+  const owner = dentists[0];
+  const visibleServices = services.filter((s) => !s.underConstruction);
+  const { street, zip, city } = siteData.practice.address;
 
   return (
     <>
       {/* ── Hero ── */}
-      <section className="-mt-20 relative min-h-screen flex items-center bg-gradient-to-br from-primary via-primary to-primary-container overflow-hidden">
-        {/* Atmospheric orbs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 -right-32 w-[500px] h-[500px] rounded-full bg-white/[0.04] blur-3xl" />
-          <div className="absolute -bottom-40 -left-20 w-[400px] h-[400px] rounded-full bg-tertiary/20 blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-72 h-72 rounded-full bg-secondary/[0.06] blur-3xl" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8 pt-40 pb-24 lg:pt-48 lg:pb-32 w-full">
-          <div className="max-w-3xl">
-            <FadeIn>
-              <p className="text-secondary-fixed/80 text-sm font-semibold tracking-[0.25em] uppercase mb-8">
-                Zahnarztpraxis in Winsen (Luhe)
-              </p>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-bold text-white leading-[1.08] tracking-tight">
-                Ihre Zahnärzte
-                <br />
-                <span className="text-tertiary-fixed">in Winsen</span>
-              </h1>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="mt-8 text-lg lg:text-xl text-white/60 max-w-xl leading-relaxed">
-                Moderne ästhetische Zahnheilkunde mit persönlicher Zuwendung.
-                Individuelle Behandlungspläne für Ihre Gesundheit und Ihr
-                Wohlbefinden.
-              </p>
-            </FadeIn>
-            <FadeIn delay={0.3}>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <a
-                  href={phoneHref}
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-semibold text-primary bg-white rounded-full hover:bg-white/90 transition-all duration-300 hover:shadow-[0_8px_32px_rgba(255,255,255,0.25)]"
-                >
-                  <Phone className="w-5 h-5" />
-                  Termin vereinbaren
-                </a>
-                <Link
-                  href="/leistungen"
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-semibold text-white/90 bg-white/[0.08] backdrop-blur-sm rounded-full hover:bg-white/[0.15] transition-all duration-300"
-                >
-                  Leistungen entdecken
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </FadeIn>
+      <section className="bg-surface">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-12 sm:py-16 lg:min-h-[calc(100svh-5rem)] lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-12">
+          <div>
+            <p className="text-sm text-on-surface-variant">{hero.eyebrow}</p>
+            <h1 className="mt-6 text-[2.5rem] font-medium leading-[1.06] tracking-[-0.03em] text-primary text-balance sm:text-5xl lg:text-[4rem]">
+              {hero.heading}
+            </h1>
+            <p className="mt-6 max-w-[36rem] text-lg leading-[1.6] text-on-surface-variant lg:text-xl">
+              {hero.text}
+            </p>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <a
+                href={phoneHref}
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-primary px-6 text-base font-medium text-primary-foreground transition-[background-color,transform] duration-150 ease-out hover:bg-primary-container active:scale-[0.98]"
+              >
+                <Phone {...icon} />
+                {hero.primaryAction}
+                <span className="font-normal tabular-nums text-white/70">
+                  {siteData.practice.phone}
+                </span>
+              </a>
+              <Link
+                href="/leistungen"
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-surface-container px-6 text-base font-medium text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-surface-high active:scale-[0.98]"
+              >
+                {hero.secondaryAction}
+                <ArrowRight {...icon} />
+              </Link>
+            </div>
           </div>
 
-          {/* Quick info pills */}
-          <FadeIn delay={0.5}>
-            <div className="mt-20 flex flex-wrap gap-3">
-              {[
-                "Implantologie",
-                "Prophylaxe",
-                "Laserbehandlung",
-                "Ästhetische Zahnheilkunde",
-                "Angstpatienten willkommen",
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="px-4 py-2 text-xs font-medium text-white/70 bg-white/[0.06] backdrop-blur-sm rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+          <figure>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-surface-container lg:aspect-auto lg:h-[min(640px,calc(100svh-12rem))]">
+              <Image
+                src={asset("/images/gallery/eingang.jpeg")}
+                alt={hero.imageAlt}
+                fill
+                priority
+                sizes="(min-width: 1024px) 600px, 100vw"
+                className="object-cover object-[50%_55%]"
+              />
             </div>
-          </FadeIn>
+            <figcaption className="mt-3 text-sm text-on-surface-variant">
+              {hero.imageCaption}
+            </figcaption>
+          </figure>
         </div>
       </section>
 
       {/* ── Welcome ── */}
-      <section className="py-24 lg:py-36 bg-surface">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            <FadeIn>
-              <p className="text-sm font-semibold text-secondary tracking-[0.2em] uppercase mb-4">
-                Willkommen
-              </p>
-              <h2 className="text-3xl lg:text-[2.75rem] font-bold text-primary leading-[1.15]">
-                Zahnmedizin mit
-                <br />
-                Leidenschaft und Präzision
-              </h2>
-              <p className="mt-8 text-base text-on-surface-variant leading-[1.8]">
-                In unserer Praxis verbinden wir modernste Behandlungsmethoden
-                mit persönlicher Zuwendung. Als Zahnarzt und Zahntechniker
-                vereint Boris Shuk die Expertise beider Welten — für
-                Ergebnisse, die funktionell und ästhetisch überzeugen.
-              </p>
-              <p className="mt-4 text-base text-on-surface-variant leading-[1.8]">
-                Seit 2013 versorgen wir Patienten in Winsen (Luhe) mit
-                individuellen Behandlungsplänen und evidenzbasierter Zahnmedizin.
-              </p>
-            </FadeIn>
-            <FadeIn delay={0.15}>
-              <div className="grid grid-cols-2 gap-5">
-                <div className="bg-card rounded-xl p-7 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
-                  <Star className="w-7 h-7 text-secondary mb-4" />
-                  <p className="text-3xl font-bold text-primary">13+</p>
-                  <p className="text-sm text-on-surface-variant mt-1">
-                    Jahre Erfahrung
-                  </p>
-                </div>
-                <div className="bg-card rounded-xl p-7 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
-                  <Shield className="w-7 h-7 text-secondary mb-4" />
-                  <p className="text-3xl font-bold text-primary">10+</p>
-                  <p className="text-sm text-on-surface-variant mt-1">
-                    Fachbereiche
-                  </p>
-                </div>
-                <div className="bg-card rounded-xl p-7 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
-                  <Sparkles className="w-7 h-7 text-secondary mb-4" />
-                  <p className="text-sm font-bold text-primary">
-                    Modernste Technik
-                  </p>
-                  <p className="text-sm text-on-surface-variant mt-1">
-                    Laser &amp; Digitale Diagnostik
-                  </p>
-                </div>
-                <div className="bg-card rounded-xl p-7 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
-                  <Heart className="w-7 h-7 text-secondary mb-4" />
-                  <p className="text-sm font-bold text-primary">Barrierefrei</p>
-                  <p className="text-sm text-on-surface-variant mt-1">
-                    Rollstuhlgerechter Zugang
-                  </p>
-                </div>
-              </div>
-            </FadeIn>
+      <section className="bg-surface-low py-20 lg:py-32">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
+          <div className="lg:col-span-7">
+            <h2 className={sectionHeading}>{welcome.heading}</h2>
+            <div className="mt-6 max-w-[40rem] space-y-4 text-base leading-[1.75] text-on-surface-variant">
+              {welcome.paragraphs.map((p) => (
+                <p key={p}>{p}</p>
+              ))}
+            </div>
           </div>
+          <dl className="grid grid-cols-2 self-end border-t border-border lg:col-span-5">
+            {welcome.facts.map((f, i) => (
+              <div
+                key={f.label}
+                className={`flex flex-col-reverse border-b border-border py-6 ${i % 2 === 0 ? "pr-6" : "pl-6"}`}
+              >
+                <dt className="mt-1 text-sm text-on-surface-variant">
+                  {f.label}
+                </dt>
+                <dd className="text-2xl font-medium tabular-nums text-primary">
+                  {f.value.replace("{services}", String(visibleServices.length))}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
       {/* ── Services ── */}
-      <section className="py-24 lg:py-36 bg-surface-low">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <FadeIn>
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold text-secondary tracking-[0.2em] uppercase mb-4">
-                Leistungen
-              </p>
-              <h2 className="text-3xl lg:text-[2.75rem] font-bold text-primary leading-[1.15]">
-                {servicesOverview.heading}
-              </h2>
-            </div>
-          </FadeIn>
-          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services
-              .filter((s) => !s.underConstruction)
-              .map((service, i) => (
-                <FadeIn key={service.slug} delay={i * 0.04}>
-                  <Link
-                    href={`/leistungen/${service.slug}`}
-                    className="group block h-full bg-card rounded-xl p-8 shadow-[0_20px_40px_rgba(16,59,92,0.03)] hover:shadow-[0_20px_40px_rgba(16,59,92,0.1)] transition-all duration-500 hover:-translate-y-1"
-                  >
-                    <h3 className="text-lg font-bold text-primary group-hover:text-tertiary transition-colors">
-                      {service.title}
-                    </h3>
-                    <p className="mt-3 text-sm text-on-surface-variant leading-relaxed">
-                      {service.shortDescription}
-                    </p>
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-secondary opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
-                      Mehr erfahren{" "}
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </Link>
-                </FadeIn>
-              ))}
-          </div>
-          <FadeIn>
-            <p className="mt-14 text-base text-on-surface-variant leading-relaxed max-w-2xl">
+      <section className="bg-surface py-20 lg:py-32">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
+          <div className="lg:col-span-4">
+            <p className={sectionLabel}>{homeContent.services.label}</p>
+            <h2 className={`mt-4 ${sectionHeading}`}>
+              {servicesOverview.heading}
+            </h2>
+            <p className="mt-6 text-base leading-[1.75] text-on-surface-variant">
               {servicesOverview.anxiousPatients}
             </p>
-          </FadeIn>
+            <Link
+              href="/leistungen"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
+            >
+              {homeContent.services.more}
+              <ArrowRight {...icon} />
+            </Link>
+          </div>
+          <ul className="border-t border-border lg:col-span-8">
+            {visibleServices.map((service) => (
+              <li key={service.slug} className="border-b border-border">
+                <Link
+                  href={`/leistungen/${service.slug}`}
+                  className="group grid grid-cols-[1fr_auto] items-center gap-6 py-5 sm:grid-cols-[16rem_1fr_auto]"
+                >
+                  <h3 className="text-lg font-medium text-primary transition-colors duration-150 ease-out group-hover:text-secondary">
+                    {service.title}
+                  </h3>
+                  <p className="col-start-1 text-sm leading-relaxed text-on-surface-variant sm:col-start-2 sm:row-start-1">
+                    {service.shortDescription}
+                  </p>
+                  <ArrowRight
+                    {...icon}
+                    className={`${icon.className} col-start-2 row-span-2 row-start-1 text-on-surface-variant transition-colors duration-150 ease-out group-hover:text-primary sm:col-start-3 sm:row-span-1`}
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* ── Team ── */}
-      <section className="py-24 lg:py-36 bg-surface">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid lg:grid-cols-5 gap-16">
-            <div className="lg:col-span-2">
-              <FadeIn>
-                <p className="text-sm font-semibold text-secondary tracking-[0.2em] uppercase mb-4">
-                  Unser Team
-                </p>
-                <h2 className="text-3xl lg:text-[2.75rem] font-bold text-primary leading-[1.15]">
-                  {teamIntro.heading}
-                </h2>
-                <p className="mt-6 text-base text-on-surface-variant leading-[1.8]">
-                  {teamIntro.text}
-                </p>
-                <Link
-                  href="/team"
-                  className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-secondary hover:text-primary transition-colors"
+      <section className="bg-surface-low py-20 lg:py-32">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
+          <div className="lg:col-span-4">
+            <p className={sectionLabel}>{homeContent.team.label}</p>
+            <h2 className={`mt-4 ${sectionHeading}`}>{teamIntro.heading}</h2>
+            <p className="mt-6 text-base leading-[1.75] text-on-surface-variant">
+              {teamIntro.text}
+            </p>
+            <Link
+              href="/team"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-primary underline-offset-4 transition-colors duration-150 ease-out hover:text-secondary hover:underline"
+            >
+              {homeContent.team.more}
+              <ArrowRight {...icon} />
+            </Link>
+          </div>
+
+          <div className="space-y-4 lg:col-span-8">
+            <article className="rounded-lg bg-card p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)] sm:p-8">
+              <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
+                <div className="relative h-40 w-32 shrink-0 overflow-hidden rounded-[8px] bg-surface-container">
+                  {owner.image && (
+                    <Image
+                      src={asset(owner.image)}
+                      alt={owner.name}
+                      fill
+                      sizes="128px"
+                      className="object-cover object-top"
+                    />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-medium text-primary">
+                    {owner.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-on-surface-variant">
+                    {owner.role}
+                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-on-surface-variant">
+                    {owner.description}
+                  </p>
+                  {owner.qualifications && (
+                    <dl className="mt-6 border-t border-border text-sm">
+                      {owner.qualifications.map((q) => {
+                        const [label, years] = q.split(": ");
+                        return (
+                          <div
+                            key={q}
+                            className="flex justify-between gap-4 border-b border-border py-2"
+                          >
+                            <dt className="text-foreground/80">{label}</dt>
+                            <dd className="shrink-0 tabular-nums text-on-surface-variant">
+                              {years}
+                            </dd>
+                          </div>
+                        );
+                      })}
+                    </dl>
+                  )}
+                </div>
+              </div>
+            </article>
+
+            <ul className="grid gap-4 sm:grid-cols-3">
+              {assistants.slice(0, 3).map((a) => (
+                <li
+                  key={a.name}
+                  className="flex items-center gap-4 rounded-lg bg-card p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
                 >
-                  Gesamtes Team kennenlernen{" "}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </FadeIn>
-            </div>
-            <div className="lg:col-span-3 space-y-5">
-              <FadeIn delay={0.1}>
-                <div className="bg-card rounded-xl p-8 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
-                  <div className="flex flex-col sm:flex-row items-start gap-6">
-                    <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
-                      {dentists[0].image ? (
-                        <Image
-                          src={asset(dentists[0].image!)}
-                          alt={dentists[0].name}
-                          width={192}
-                          height={192}
-                          className="w-full h-full object-cover object-top"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white text-2xl font-bold">
-                          BS
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-primary">
-                        {dentists[0].name}
-                      </h3>
-                      <p className="text-sm text-secondary font-medium mt-0.5">
-                        {dentists[0].role}
-                      </p>
-                      <p className="mt-4 text-sm text-on-surface-variant leading-relaxed">
-                        {dentists[0].description}
-                      </p>
-                      {dentists[0].qualifications && (
-                        <ul className="mt-5 space-y-2">
-                          {dentists[0].qualifications.map((q) => (
-                            <li
-                              key={q}
-                              className="text-xs text-on-surface-variant flex items-start gap-2.5"
-                            >
-                              <span className="w-1 h-1 rounded-full bg-secondary mt-1.5 shrink-0" />
-                              {q}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                  <div className="relative size-14 shrink-0 overflow-hidden rounded-[8px] bg-surface-container">
+                    {a.image && (
+                      <Image
+                        src={asset(a.image)}
+                        alt={a.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover object-top"
+                      />
+                    )}
                   </div>
-                </div>
-              </FadeIn>
-              <FadeIn delay={0.2}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {assistants.slice(0, 3).map((a) => (
-                    <div
-                      key={a.name}
-                      className="bg-surface-low rounded-xl p-5"
-                    >
-                      <p className="text-sm font-semibold text-primary">
-                        {a.name}
-                      </p>
-                      <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                        {a.role}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </FadeIn>
-            </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-primary">{a.name}</p>
+                    <p className="mt-1 text-sm leading-snug text-on-surface-variant">
+                      {a.role}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* ── Contact CTA ── */}
-      <section className="relative py-24 lg:py-36 bg-gradient-to-br from-primary via-primary to-tertiary overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-white/[0.03] blur-3xl" />
-          <div className="absolute -bottom-32 left-0 w-[400px] h-[400px] rounded-full bg-secondary/[0.05] blur-3xl" />
-        </div>
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <FadeIn>
-              <h2 className="text-3xl lg:text-[2.75rem] font-bold text-white leading-[1.15]">
-                Vereinbaren Sie
-                <br />
-                Ihren Termin
-              </h2>
-              <p className="mt-6 text-lg text-white/60 leading-relaxed max-w-md">
-                Wir freuen uns auf Ihren Besuch. Rufen Sie uns an oder kommen
-                Sie vorbei.
-              </p>
-              <a
-                href={phoneHref}
-                className="mt-8 inline-flex items-center gap-3 px-8 py-4 text-lg font-bold text-primary bg-white rounded-full hover:bg-white/90 transition-all duration-300 hover:shadow-[0_8px_32px_rgba(255,255,255,0.25)]"
-              >
-                <Phone className="w-5 h-5" />
-                {siteData.practice.phone}
-              </a>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <div className="bg-white/[0.07] backdrop-blur-sm rounded-xl p-8">
-                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2.5">
-                  <Clock className="w-5 h-5 text-tertiary-fixed" />
-                  Sprechzeiten
-                </h3>
-                <div className="space-y-3.5">
-                  {siteData.openingHours.map((h) => (
-                    <div
-                      key={h.day}
-                      className="flex justify-between text-sm gap-4"
-                    >
-                      <span className="text-white/90 font-medium">
-                        {h.day}
-                      </span>
-                      <span className="text-white/60 tabular-nums">
-                        {h.hours}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-8 pt-6">
-                  <Link
-                    href="/anfahrt"
-                    className="flex items-center gap-2.5 text-sm text-white/70 hover:text-white transition-colors"
-                  >
-                    <MapPin className="w-4 h-4 shrink-0" />
-                    {siteData.practice.address.street},{" "}
-                    {siteData.practice.address.zip}{" "}
-                    {siteData.practice.address.city}
-                  </Link>
-                </div>
-              </div>
-            </FadeIn>
+      {/* ── Contact ── */}
+      <section className="bg-primary py-20 text-primary-foreground lg:py-28">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
+          <div className="lg:col-span-6">
+            <h2 className="text-3xl font-medium leading-[1.15] tracking-[-0.02em] lg:text-[2.5rem]">
+              {contact.heading}
+            </h2>
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-white/70">
+              {contact.text}
+            </p>
+            <a
+              href={phoneHref}
+              className="mt-10 inline-flex h-12 items-center gap-2 rounded-[10px] bg-surface px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white text-base font-medium tabular-nums text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-white active:scale-[0.98]"
+            >
+              <Phone {...icon} />
+              {siteData.practice.phone}
+            </a>
+          </div>
+
+          <div className="lg:col-span-5 lg:col-start-8">
+            <h3 className="text-sm font-medium text-white/60">
+              {contact.hoursHeading}
+            </h3>
+            <OpeningHours tone="dark" className="mt-4" />
+            <Link
+              href="/anfahrt"
+              className="mt-6 flex min-h-11 items-center gap-2 text-sm text-white/70 transition-colors duration-150 ease-out hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <MapPin {...icon} />
+              <span>
+                {street}, {zip} {city}
+                <span className="text-white/70"> · {contact.directions}</span>
+              </span>
+            </Link>
           </div>
         </div>
       </section>

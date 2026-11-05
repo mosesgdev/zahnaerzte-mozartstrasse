@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { EmergencyEntry } from "@/lib/emergency-settings";
 import { getEmergencySettings } from "@/lib/emergency-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
+import { RichText } from "@/components/shared/RichText";
 import {
   AlertCircle,
   Clock,
@@ -155,9 +156,11 @@ export default async function NotdienstPage() {
             <h1 className="text-4xl lg:text-[3.5rem] font-bold text-white leading-[1.08]">
               {settings.title}
             </h1>
-            <p className="mt-6 text-lg text-white/75 max-w-3xl leading-relaxed">
-              {settings.intro}
-            </p>
+            <RichText
+              text={settings.intro}
+              className="mt-6 space-y-4 max-w-3xl"
+              paragraphClassName="text-lg text-white/75 leading-relaxed"
+            />
           </FadeIn>
         </div>
       </section>
@@ -206,9 +209,11 @@ export default async function NotdienstPage() {
                 <h2 className="text-xl font-bold text-primary mb-3">
                   Sprechzeiten im Notdienst
                 </h2>
-                <p className="text-base text-on-surface-variant leading-[1.8]">
-                  {settings.consultationText}
-                </p>
+                <RichText
+                  text={settings.consultationText}
+                  className="space-y-4"
+                  paragraphClassName="text-base text-on-surface-variant leading-[1.8]"
+                />
               </div>
             </div>
           </FadeIn>

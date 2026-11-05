@@ -15,8 +15,12 @@ export default async function AdminTeamPage() {
   const team = await getTeamSettings();
 
   return (
-    <AdminFrame title="Team">
-      <div className="bg-card rounded-2xl p-7 lg:p-9 shadow-[0_20px_50px_rgba(16,59,92,0.06)]">
+    <AdminFrame
+      title="Team"
+      area="team"
+      intro="Tippen Sie auf eine Person, um Name, Funktion, Text oder Foto zu ändern. Mit den Pfeilen ändern Sie die Reihenfolge."
+    >
+      <div className="bg-card rounded-2xl p-4 sm:p-6 lg:p-9 shadow-[0_20px_50px_rgba(16,59,92,0.06)]">
         <TeamSettingsForm initial={team} />
       </div>
     </AdminFrame>

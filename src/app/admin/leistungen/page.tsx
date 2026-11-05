@@ -15,8 +15,12 @@ export default async function AdminLeistungenPage() {
   const serviceSettings = await getServiceSettings();
 
   return (
-    <AdminFrame title="Leistungen">
-      <div className="bg-card rounded-2xl p-7 lg:p-9 shadow-[0_20px_50px_rgba(16,59,92,0.06)]">
+    <AdminFrame
+      title="Leistungen"
+      area="leistungen"
+      intro="Tippen Sie auf eine Leistung, um Namen, Texte oder Bild zu ändern. Ein neuer Name erscheint nach dem Speichern sofort auch im Menü der Website."
+    >
+      <div className="bg-card rounded-2xl p-4 sm:p-6 lg:p-9 shadow-[0_20px_50px_rgba(16,59,92,0.06)]">
         <ServiceSettingsForm initial={serviceSettings} />
       </div>
     </AdminFrame>

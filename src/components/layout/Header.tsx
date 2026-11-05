@@ -4,20 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AlertCircle, Menu, X, Phone, ChevronDown } from "lucide-react";
-import { navigation } from "@content/pages";
+import { navigation, type NavItem } from "@content/pages";
 import { siteData } from "@content/site-data";
 import { asset } from "@/lib/utils";
 
-interface NavItem {
-  label: string;
-  href: string;
-  children?: { label: string; href: string }[];
-}
+const utilityItems = navigation.utility;
 
-const navItems = navigation.main as NavItem[];
-const utilityItems = navigation.utility as NavItem[];
-
-export default function Header() {
+export default function Header({ navItems }: { navItems: NavItem[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopDropdown, setDesktopDropdown] = useState<string | null>(null);
   const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);

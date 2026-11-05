@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { pages } from "@content/pages";
 import { FadeIn } from "@/components/shared/FadeIn";
+import { RichText } from "@/components/shared/RichText";
 import { asset } from "@/lib/utils";
 import { getGallerySettings } from "@/lib/gallery-settings";
 
@@ -94,11 +95,11 @@ export default async function PraxisgaleriePage() {
                     <h3 className="text-sm font-semibold text-primary">
                       {img.title}
                     </h3>
-                    {img.copy && (
-                      <p className="mt-2 text-sm text-on-surface-variant leading-relaxed">
-                        {img.copy}
-                      </p>
-                    )}
+                    <RichText
+                      text={img.copy}
+                      className="mt-2 space-y-2"
+                      paragraphClassName="text-sm text-on-surface-variant leading-relaxed"
+                    />
                   </div>
                 </div>
               </FadeIn>

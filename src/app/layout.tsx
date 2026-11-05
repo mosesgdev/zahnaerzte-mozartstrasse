@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { siteData } from "@content/site-data";
+import { getMainNavigation } from "@/lib/navigation";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -57,15 +58,17 @@ const jsonLd = {
   })),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const navItems = await getMainNavigation();
+
   return (
     <html lang="de" className={`${manrope.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Header />
+        <Header navItems={navItems} />
         <main className="flex-1 pt-20">{children}</main>
         <Footer />
         <script

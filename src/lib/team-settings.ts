@@ -2,6 +2,7 @@ import "server-only";
 
 import { assistants, dentists, teamIntro, type TeamMember } from "@content/team";
 import { getJson, setJson } from "@/lib/kv";
+import { normalizeText } from "@/lib/text";
 
 export interface EditableTeamMember extends TeamMember {
   id: string;
@@ -36,7 +37,7 @@ function normalize(settings: TeamSettings): TeamSettings {
     intro: {
       heading: settings.intro?.heading?.trim() || teamIntro.heading,
       subheading: settings.intro?.subheading?.trim() || teamIntro.subheading,
-      text: settings.intro?.text?.trim() || teamIntro.text,
+      text: normalizeText(settings.intro?.text) || teamIntro.text,
     },
     members: Array.isArray(settings.members)
       ? settings.members
@@ -46,7 +47,7 @@ function normalize(settings: TeamSettings): TeamSettings {
             group: member.group === "dentists" ? "dentists" : "assistants",
             name: member.name.trim(),
             role: member.role.trim(),
-            description: member.description?.trim() || undefined,
+            description: normalizeText(member.description) || undefined,
             qualifications: Array.isArray(member.qualifications)
               ? member.qualifications.map((q) => q.trim()).filter(Boolean)
               : [],

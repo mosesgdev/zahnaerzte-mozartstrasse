@@ -168,21 +168,9 @@ export async function syncEmergencySettingsFromSource() {
     ? previousUpload
     : await saveUpload({ name: documentName, mimeType: "application/pdf", data });
 
+  // Only replace the plan itself; texts edited in the admin stay untouched.
   await setEmergencySettings({
-    title: "Zahnärztlicher Notdienst",
-    intro:
-      "Sollten Sie einen akuten zahnmedizinischen Notfall am Wochenende oder Feiertag haben, wenden Sie sich bitte zuerst telefonisch an die aufgeführten Praxen. So können Therapiebedarf und Wartezeit besser koordiniert werden.",
-    nonEmergencyItems: [
-      "die herausgefallene Füllung",
-      "eine Druckstelle einer Prothese",
-      "zerbrochener Zahnersatz",
-      "das herausgefallene Provisorium",
-      "die herausgefallene Krone",
-      "die Entfernung von Nähten",
-    ],
-    consultationText:
-      "Die Notdienstsprechstunde findet an den jeweiligen Tagen am Vormittag in der Zeit von 10 bis 12 Uhr statt. Außerhalb dieser Zeit besteht eine Rufbereitschaft.",
-    documentLabel: "Notdienstplan herunterladen",
+    ...previous,
     documentUrl: `/uploads/admin/${upload.id}`,
     documentName,
     documentText: parsed.documentText,

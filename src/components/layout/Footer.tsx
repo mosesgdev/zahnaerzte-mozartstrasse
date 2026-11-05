@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { siteData } from "@content/site-data";
 import { navigation } from "@content/pages";
-import { services } from "@content/services";
+import { getServiceSettings, serviceMenuLabel } from "@/lib/service-settings";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { OpeningHours } from "@/components/shared/OpeningHours";
 
-export default function Footer() {
+export default async function Footer() {
+  const { services } = await getServiceSettings();
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
 
   return (
@@ -62,7 +63,7 @@ export default function Footer() {
                     href={`/leistungen/${s.slug}`}
                     className="text-sm text-on-surface-variant hover:text-primary transition-colors duration-150 ease-out"
                   >
-                    {s.title}
+                    {serviceMenuLabel(s)}
                   </Link>
                 </li>
               ))}

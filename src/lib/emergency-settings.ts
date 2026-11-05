@@ -2,6 +2,7 @@ import "server-only";
 
 import { parseEmergencyPdfText } from "@/lib/emergency-parser";
 import { getJson, setJson } from "@/lib/kv";
+import { normalizeText } from "@/lib/text";
 
 export interface EmergencyEntry {
   id: string;
@@ -87,12 +88,12 @@ function normalize(settings: EmergencySettings): EmergencySettings {
 
   return {
     title: settings.title?.trim() || fallbackEmergencySettings.title,
-    intro: settings.intro?.trim() || fallbackEmergencySettings.intro,
+    intro: normalizeText(settings.intro) || fallbackEmergencySettings.intro,
     nonEmergencyItems: Array.isArray(settings.nonEmergencyItems)
       ? settings.nonEmergencyItems.map((item) => item.trim()).filter(Boolean)
       : fallbackEmergencySettings.nonEmergencyItems,
     consultationText:
-      settings.consultationText?.trim() ||
+      normalizeText(settings.consultationText) ||
       fallbackEmergencySettings.consultationText,
     documentLabel:
       settings.documentLabel?.trim() || fallbackEmergencySettings.documentLabel,

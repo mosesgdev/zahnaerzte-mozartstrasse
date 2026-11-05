@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTeamSettings } from "@/lib/team-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
+import { RichText } from "@/components/shared/RichText";
 import { ArrowRight, Phone } from "lucide-react";
 import { siteData } from "@content/site-data";
 import { asset } from "@/lib/utils";
@@ -57,9 +58,11 @@ export default async function TeamPage() {
             <h1 className="text-4xl lg:text-[3.5rem] font-bold text-white leading-[1.08]">
               {intro.heading}
             </h1>
-            <p className="mt-6 text-lg text-white/60 max-w-xl leading-relaxed">
-              {intro.text}
-            </p>
+            <RichText
+              text={intro.text}
+              className="mt-6 space-y-4 max-w-xl"
+              paragraphClassName="text-lg text-white/60 leading-relaxed"
+            />
           </FadeIn>
         </div>
       </section>
@@ -90,9 +93,11 @@ export default async function TeamPage() {
                   <p className="text-base text-secondary font-medium mt-1">
                     {mainDentist?.role ?? ""}
                   </p>
-                  <p className="mt-6 text-base text-on-surface-variant leading-[1.8] max-w-2xl">
-                    {mainDentist?.description}
-                  </p>
+                  <RichText
+                    text={mainDentist?.description}
+                    className="mt-6 space-y-4 max-w-2xl"
+                    paragraphClassName="text-base text-on-surface-variant leading-[1.8]"
+                  />
                   {mainDentist?.qualifications &&
                     mainDentist.qualifications.length > 0 && (
                       <div className="mt-8">
@@ -157,11 +162,11 @@ export default async function TeamPage() {
                   <p className="text-sm text-secondary font-medium mt-1">
                     {member.role}
                   </p>
-                  {member.description && (
-                    <p className="mt-3 text-sm text-on-surface-variant leading-relaxed">
-                      {member.description}
-                    </p>
-                  )}
+                  <RichText
+                    text={member.description}
+                    className="mt-3 space-y-3"
+                    paragraphClassName="text-sm text-on-surface-variant leading-relaxed"
+                  />
                 </div>
               </FadeIn>
             ))}

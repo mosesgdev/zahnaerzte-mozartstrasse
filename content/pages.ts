@@ -163,29 +163,25 @@ export const homeContent = {
   },
 };
 
-export const navigation = {
+export interface NavItem {
+  label: string;
+  href: string;
+  children?: { label: string; href: string }[];
+}
+
+export const navigation: {
+  main: NavItem[];
+  utility: NavItem[];
+  quickLinks: NavItem[];
+  footer: NavItem[];
+} = {
   main: [
     {
       label: "Leistungen",
       href: "/leistungen",
-      children: [
-        { label: "Prophylaxe", href: "/leistungen/prophylaxe" },
-        { label: "Parodontitis", href: "/leistungen/parodontitis" },
-        {
-          label: "Ästhetische Zahnheilkunde",
-          href: "/leistungen/aesthetische-zahnheilkunde",
-        },
-        { label: "Vollkeramik", href: "/leistungen/vollkeramik" },
-        { label: "Laserbehandlung", href: "/leistungen/laser" },
-        { label: "Zahnersatz", href: "/leistungen/zahnersatz" },
-        { label: "Implantate", href: "/leistungen/implantate" },
-        {
-          label: "Kinderzahnheilkunde",
-          href: "/leistungen/kinderzahnheilkunde",
-        },
-        { label: "Wurzelkanal", href: "/leistungen/wurzelkanal" },
-        { label: "Specials", href: "/leistungen/specials" },
-      ],
+      // Filled at runtime from the editable service settings (admin →
+      // Leistungen), falling back to content/services.ts. See src/lib/navigation.ts.
+      children: [],
     },
     {
       label: "Praxis",

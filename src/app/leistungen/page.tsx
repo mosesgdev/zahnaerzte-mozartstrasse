@@ -6,6 +6,7 @@ import { FadeIn } from "@/components/shared/FadeIn";
 import { ArrowRight, Phone } from "lucide-react";
 import { siteData } from "@content/site-data";
 import { asset } from "@/lib/utils";
+import { RichText } from "@/components/shared/RichText";
 
 export const metadata: Metadata = {
   title: "Unsere Leistungen",
@@ -117,9 +118,11 @@ export default async function LeistungenPage() {
                 <h3 className="text-lg font-bold text-primary mb-4">
                   Angstpatienten
                 </h3>
-                <p className="text-base text-on-surface-variant leading-[1.8]">
-                  {overview.anxiousPatients}
-                </p>
+                <RichText
+                  text={overview.anxiousPatients}
+                  className="space-y-4"
+                  paragraphClassName="text-base text-on-surface-variant leading-[1.8]"
+                />
                 <a
                   href={`tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`}
                   className="mt-6 inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-primary to-primary-container rounded-full hover:shadow-[0_8px_24px_rgba(16,59,92,0.3)] transition-all duration-300"

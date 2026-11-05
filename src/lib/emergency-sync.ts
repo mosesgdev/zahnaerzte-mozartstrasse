@@ -7,7 +7,12 @@ import {
   getEmergencySettings,
   setEmergencySettings,
 } from "@/lib/emergency-settings";
-import { saveUpload } from "@/lib/uploads";
+import {
+  deleteUpload,
+  getUpload,
+  saveUpload,
+  uploadIdFromUrl,
+} from "@/lib/uploads";
 
 const SOURCE_URL =
   process.env.NOTDIENST_SOURCE_URL ||
@@ -152,22 +157,31 @@ export async function syncEmergencySettingsFromSource() {
   const bytes = Buffer.from(await pdfResponse.arrayBuffer());
   const parsed = await parseEmergencyPdfBytes(bytes);
   const documentName = filenameFromUrl(pdfUrl);
-  const upload = await saveUpload({
-    name: documentName,
-    mimeType: "application/pdf",
-    data: bytes.toString("base64"),
-  });
+  const data = bytes.toString("base64");
+
+  // Store the PDF only when it changed; the daily cron mostly sees the same plan.
+  const previous = await getEmergencySettings();
+  const previousId = uploadIdFromUrl(previous.documentUrl);
+  const previousUpload = previousId ? await getUpload(previousId) : undefined;
+  const unchanged = previousUpload?.data === data;
+  const upload = unchanged
+    ? previousUpload
+    : await saveUpload({ name: documentName, mimeType: "application/pdf", data });
 
   // Only replace the plan itself; texts edited in the admin stay untouched.
-  const current = await getEmergencySettings();
   await setEmergencySettings({
-    ...current,
+    ...previous,
     documentUrl: `/uploads/admin/${upload.id}`,
     documentName,
     documentText: parsed.documentText,
     lastSyncedAt: new Date().toISOString(),
     entries: parsed.entries,
   });
+
+  // The replaced plan PDF is no longer linked anywhere.
+  if (!unchanged && previousId) {
+    await deleteUpload(previousId);
+  }
 
   return {
     sourceUrl: SOURCE_URL,

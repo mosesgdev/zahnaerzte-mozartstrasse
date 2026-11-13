@@ -111,6 +111,7 @@ export function TeamSettingsForm({ initial }: { initial: TeamSettings }) {
           }
         />
         <TextAreaField
+          markdown
           label="Einleitungstext"
           rows={4}
           value={settings.intro.text}
@@ -166,6 +167,7 @@ export function TeamSettingsForm({ initial }: { initial: TeamSettings }) {
                     onChange={(role) => updateMember(member.id, { role })}
                   />
                   <TextAreaField
+                    markdown
                     label="Vorstellungstext"
                     value={member.description ?? ""}
                     onChange={(description) => updateMember(member.id, { description })}
@@ -268,6 +270,7 @@ export function GallerySettingsForm({ initial }: { initial: GallerySettings }) {
                 onChange={(title) => updateImage(image.id, { title })}
               />
               <TextAreaField
+                markdown
                 label="Bildunterschrift (optional)"
                 rows={3}
                 value={image.copy ?? ""}
@@ -555,6 +558,7 @@ export function ServiceSettingsForm({ initial }: { initial: ServiceSettings }) {
           onChange={(allServices) => updateOverview({ allServices })}
         />
         <TextAreaField
+          markdown
           label="Text für Angstpatienten"
           rows={4}
           value={settings.overview.anxiousPatients}
@@ -705,11 +709,13 @@ export function EmergencySettingsForm({ initial }: { initial: EmergencySettings 
           onChange={(title) => setSettings((current) => ({ ...current, title }))}
         />
         <TextAreaField
+          markdown
           label="Einleitungstext"
           value={settings.intro}
           onChange={(intro) => setSettings((current) => ({ ...current, intro }))}
         />
         <TextAreaField
+          markdown
           label="Sprechzeiten im Notdienst"
           rows={4}
           value={settings.consultationText}
@@ -829,6 +835,7 @@ export function SiteSettingsForm({ initial }: { initial: SiteSettings }) {
           placeholder="z. B. Liebe Patientinnen und Patienten"
         />
         <TextAreaField
+          markdown
           label="Text"
           rows={5}
           value={settings.announcement.text}

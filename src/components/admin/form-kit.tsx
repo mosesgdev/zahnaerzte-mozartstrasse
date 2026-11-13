@@ -296,20 +296,24 @@ function applyMarkdown(
     const next = value.slice(0, start) + result.text + value.slice(end);
     return { value: next, cursor: start + result.text.length };
   }
-  // Line-based: prefix every selected line, starting at the beginning of the line.
+  // Line-based: prefix every touched line (whole lines, also for a bare cursor).
   const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-  const block = selected ? value.slice(lineStart, end) : result.text;
-  const prefixed = block
+  // A selection ending right after a line break does not touch the next line.
+  const last = end > start && value[end - 1] === "\n" ? end - 1 : end;
+  const nextBreak = value.indexOf("\n", last);
+  const lineEnd = nextBreak === -1 ? value.length : nextBreak;
+  const block = value.slice(lineStart, lineEnd);
+  let n = 0;
+  const prefixed = (block.trim() ? block : result.text)
     .split("\n")
-    .map((line, i) =>
-      result.prefix === "1. " ? `${i + 1}. ${line}` : `${result.prefix}${line}`,
-    )
+    .map((line) => {
+      if (!line.trim()) return line;
+      n += 1;
+      return result.prefix === "1. " ? `${n}. ${line}` : `${result.prefix}${line}`;
+    })
     .join("\n");
-  const from = selected ? lineStart : start;
-  const needsBreak = !selected && from > 0 && value[from - 1] !== "\n";
-  const insert = (needsBreak ? "\n" : "") + prefixed;
-  const next = value.slice(0, from) + insert + value.slice(end);
-  return { value: next, cursor: from + insert.length };
+  const next = value.slice(0, lineStart) + prefixed + value.slice(lineEnd);
+  return { value: next, cursor: lineStart + prefixed.length };
 }
 
 /**
@@ -396,6 +400,7 @@ export function TextAreaField({
       {markdown && preview ? (
         <div
           className={`${fieldClass} min-h-24 bg-surface`}
+          role="region"
           aria-label={`Vorschau „${label}“`}
         >
           {value.trim() ? (

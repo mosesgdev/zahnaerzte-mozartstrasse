@@ -310,7 +310,11 @@ export async function updateServiceSettingsAction(
     !payload.services.every(
       (service) =>
         isAllowedAsset(service.image, "image") &&
-        (service.images ?? []).every((src) => isAllowedAsset(src, "image")),
+        (service.images === undefined ||
+          (Array.isArray(service.images) &&
+            service.images.every(
+              (src) => typeof src === "string" && isAllowedAsset(src, "image"),
+            ))),
     )
   ) {
     return { error: "Nicht gespeichert: Ein Bild hat eine ungültige Adresse. Bitte das Bild neu hochladen." };
@@ -346,14 +350,17 @@ export async function updateSiteSettingsAction(
   if (!payload || !Array.isArray(payload.openingHours)) {
     return { error: "Die Angaben konnten nicht gelesen werden." };
   }
-  const missingDay = payload.openingHours.findIndex((entry) => !entry.day?.trim());
+  const missingDay = payload.openingHours.findIndex(
+    (entry) => typeof entry?.day !== "string" || !entry.day.trim(),
+  );
   if (missingDay >= 0) {
     return {
       error: `Nicht gespeichert: Bitte in Zeile ${missingDay + 1} der Sprechzeiten einen Tag eintragen.`,
     };
   }
   const announcement = payload.announcement;
-  if (announcement?.enabled && !announcement.title?.trim() && !announcement.text?.trim()) {
+  const hasText = (value: unknown) => typeof value === "string" && value.trim() !== "";
+  if (announcement?.enabled && !hasText(announcement.title) && !hasText(announcement.text)) {
     return {
       error: "Nicht gespeichert: Der Hinweis ist eingeschaltet, hat aber weder Überschrift noch Text.",
     };

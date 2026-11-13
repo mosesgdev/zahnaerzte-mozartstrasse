@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { pages } from "@content/pages";
-import { siteData } from "@content/site-data";
 import { getSiteSettings } from "@/lib/site-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
 import {

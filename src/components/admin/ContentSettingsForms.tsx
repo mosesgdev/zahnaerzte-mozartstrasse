@@ -759,7 +759,9 @@ function ExtraImagesField({
         </p>
       </div>
       {images.map((src, index) => (
-        <div key={`${index}-${src}`} className="space-y-2">
+        // Index key: keying on src would remount after upload and drop the
+        // "Bild hochgeladen … Speichern" notice.
+        <div key={index} className="space-y-2">
           <ImageUploadField
             label={`Foto ${index + 2}`}
             value={src}

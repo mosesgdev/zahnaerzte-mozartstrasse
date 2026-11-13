@@ -29,14 +29,19 @@ const fallbackSiteSettings: SiteSettings = {
   announcement: { enabled: false, title: "", text: "" },
 };
 
+/** Stored/posted JSON is untrusted: non-strings become "". */
+function str(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function normalize(settings: Partial<SiteSettings>): SiteSettings {
   const openingHours = Array.isArray(settings.openingHours)
     ? settings.openingHours
-        .filter((entry) => entry.day?.trim())
+        .filter((entry) => str(entry?.day))
         .map((entry) => ({
-          day: entry.day.trim(),
-          hours: entry.hours?.trim() ?? "",
-          break: entry.break?.trim() || null,
+          day: str(entry.day),
+          hours: str(entry.hours),
+          break: str(entry.break) || null,
         }))
     : fallbackSiteSettings.openingHours;
 
@@ -44,9 +49,9 @@ function normalize(settings: Partial<SiteSettings>): SiteSettings {
   return {
     openingHours,
     announcement: {
-      enabled: Boolean(announcement?.enabled),
-      title: announcement?.title?.trim() ?? "",
-      text: normalizeText(announcement?.text),
+      enabled: announcement?.enabled === true,
+      title: str(announcement?.title),
+      text: normalizeText(str(announcement?.text)),
     },
   };
 }

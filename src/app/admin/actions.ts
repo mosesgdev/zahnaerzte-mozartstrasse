@@ -26,6 +26,10 @@ import {
   type ServiceSettings,
 } from "@/lib/service-settings";
 import {
+  setSiteSettings,
+  type SiteSettings,
+} from "@/lib/site-settings";
+import {
   setEmergencySettings,
   type EmergencySettings,
 } from "@/lib/emergency-settings";
@@ -302,7 +306,17 @@ export async function updateServiceSettingsAction(
     }
     seen.set(slug, service.title.trim());
   }
-  if (!payload.services.every((service) => isAllowedAsset(service.image, "image"))) {
+  if (
+    !payload.services.every(
+      (service) =>
+        isAllowedAsset(service.image, "image") &&
+        (service.images === undefined ||
+          (Array.isArray(service.images) &&
+            service.images.every(
+              (src) => typeof src === "string" && isAllowedAsset(src, "image"),
+            ))),
+    )
+  ) {
     return { error: "Nicht gespeichert: Ein Bild hat eine ungültige Adresse. Bitte das Bild neu hochladen." };
   }
 
@@ -325,4 +339,33 @@ export async function updateEmergencySettingsAction(
 
   await setEmergencySettings(payload);
   return afterSave("notdienst");
+}
+
+export async function updateSiteSettingsAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  await requireAuth();
+  const payload = parsePayload<SiteSettings>(formData);
+  if (!payload || !Array.isArray(payload.openingHours)) {
+    return { error: "Die Angaben konnten nicht gelesen werden." };
+  }
+  const missingDay = payload.openingHours.findIndex(
+    (entry) => typeof entry?.day !== "string" || !entry.day.trim(),
+  );
+  if (missingDay >= 0) {
+    return {
+      error: `Nicht gespeichert: Bitte in Zeile ${missingDay + 1} der Sprechzeiten einen Tag eintragen.`,
+    };
+  }
+  const announcement = payload.announcement;
+  const hasText = (value: unknown) => typeof value === "string" && value.trim() !== "";
+  if (announcement?.enabled && !hasText(announcement.title) && !hasText(announcement.text)) {
+    return {
+      error: "Nicht gespeichert: Der Hinweis ist eingeschaltet, hat aber weder Überschrift noch Text.",
+    };
+  }
+
+  await setSiteSettings(payload);
+  return afterSave("startseite");
 }

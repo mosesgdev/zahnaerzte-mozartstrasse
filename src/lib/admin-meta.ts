@@ -4,6 +4,7 @@ import { getJson, setJson } from "@/lib/kv";
 
 /** Admin areas that track a "zuletzt geändert" timestamp. */
 export type AdminArea =
+  | "startseite"
   | "notdienst"
   | "urlaubszeiten"
   | "team"

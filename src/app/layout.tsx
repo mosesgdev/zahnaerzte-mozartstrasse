@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { siteData } from "@content/site-data";
 import { getMainNavigation } from "@/lib/navigation";
+import { getSiteSettings, type OpeningHoursEntry } from "@/lib/site-settings";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -36,7 +37,8 @@ const dayMap: Record<string, string> = {
   Freitag: "Friday",
 };
 
-const jsonLd = {
+function buildJsonLd(openingHours: OpeningHoursEntry[]) {
+  return {
   "@context": "https://schema.org",
   "@type": ["Dentist", "LocalBusiness"],
   name: siteData.practice.name,
@@ -50,20 +52,25 @@ const jsonLd = {
     addressLocality: siteData.practice.address.city,
     addressCountry: "DE",
   },
-  openingHoursSpecification: siteData.openingHours.map((h) => ({
+  openingHoursSpecification: openingHours.map((h) => ({
     "@type": "OpeningHoursSpecification",
     dayOfWeek: dayMap[h.day] ?? h.day,
-    opens: h.hours.split("–")[0]?.trim(),
-    closes: h.hours.split("–")[1]?.trim(),
+    opens: h.hours.split(/[–-]/)[0]?.trim(),
+    closes: h.hours.split(/[–-]/)[1]?.trim(),
   })),
-};
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const navItems = await getMainNavigation();
+  const [navItems, { openingHours }] = await Promise.all([
+    getMainNavigation(),
+    getSiteSettings(),
+  ]);
+  const jsonLd = buildJsonLd(openingHours);
 
   return (
     <html lang="de" className={`${manrope.variable} h-full antialiased`}>
@@ -73,7 +80,10 @@ export default async function RootLayout({
         <Footer />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          // Opening hours are admin-edited: escape "<" so "</script>" can't break out.
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
         />
       </body>
     </html>

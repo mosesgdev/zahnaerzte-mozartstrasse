@@ -3,6 +3,7 @@ import Image from "next/image";
 import { siteData } from "@content/site-data";
 import { getServiceSettings } from "@/lib/service-settings";
 import { getTeamSettings } from "@/lib/team-settings";
+import { getSiteSettings } from "@/lib/site-settings";
 import { RichText } from "@/components/shared/RichText";
 import { homeContent } from "@content/pages";
 import { OpeningHours } from "@/components/shared/OpeningHours";
@@ -16,8 +17,17 @@ const sectionHeading =
   "text-3xl lg:text-[2.5rem] font-medium text-primary leading-[1.15] tracking-[-0.02em] text-balance";
 
 export default async function Home() {
-  const [{ services, overview: servicesOverview }, { intro: teamIntro, members }] =
-    await Promise.all([getServiceSettings(), getTeamSettings()]);
+  const [
+    { services, overview: servicesOverview },
+    { intro: teamIntro, members },
+    { openingHours, announcement },
+  ] = await Promise.all([
+    getServiceSettings(),
+    getTeamSettings(),
+    getSiteSettings(),
+  ]);
+  const showAnnouncement =
+    announcement.enabled && Boolean(announcement.title || announcement.text);
   const dentists = members.filter((m) => m.group === "dentists");
   const assistants = members.filter((m) => m.group === "assistants");
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
@@ -28,31 +38,54 @@ export default async function Home() {
 
   return (
     <>
+      {/* ── Announcement (admin → Startseite) ── */}
+      {showAnnouncement && (
+        <section
+          aria-label="Hinweis für Patienten"
+          className="bg-surface-container"
+        >
+          <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
+            <div className="border-l-4 border-secondary pl-4">
+              {announcement.title && (
+                <h2 className="text-lg font-semibold leading-snug text-primary lg:text-xl">
+                  {announcement.title}
+                </h2>
+              )}
+              <RichText
+                text={announcement.text}
+                className={`${announcement.title ? "mt-1.5" : ""} max-w-[48rem] space-y-2`}
+                paragraphClassName="text-base leading-[1.6] text-on-surface-variant"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Hero ── */}
-      <section className="bg-surface">
+      <section className="bg-primary text-primary-foreground">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-12 sm:py-16 lg:min-h-[calc(100svh-5rem)] lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-12">
           <div>
-            <p className="text-sm text-on-surface-variant">{hero.eyebrow}</p>
-            <h1 className="mt-6 text-[2.5rem] font-medium leading-[1.06] tracking-[-0.03em] text-primary text-balance sm:text-5xl lg:text-[4rem]">
+            <p className="text-sm text-white/70">{hero.eyebrow}</p>
+            <h1 className="mt-6 text-[2.5rem] font-medium leading-[1.06] tracking-[-0.03em] text-white text-balance sm:text-5xl lg:text-[4rem]">
               {hero.heading}
             </h1>
-            <p className="mt-6 max-w-[36rem] text-lg leading-[1.6] text-on-surface-variant lg:text-xl">
+            <p className="mt-6 max-w-[36rem] text-lg leading-[1.6] text-white/80 lg:text-xl">
               {hero.text}
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <a
                 href={phoneHref}
-                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-primary px-6 text-base font-medium text-primary-foreground transition-[background-color,transform] duration-150 ease-out hover:bg-primary-container active:scale-[0.98]"
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-surface px-6 text-base font-medium text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.98]"
               >
                 <Phone {...icon} />
                 {hero.primaryAction}
-                <span className="font-normal tabular-nums text-white/70">
+                <span className="font-normal tabular-nums text-primary/70">
                   {siteData.practice.phone}
                 </span>
               </a>
               <Link
                 href="/leistungen"
-                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-surface-container px-6 text-base font-medium text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-surface-high active:scale-[0.98]"
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-white/10 px-6 text-base font-medium text-white ring-1 ring-white/25 transition-[background-color,transform] duration-150 ease-out hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.98]"
               >
                 {hero.secondaryAction}
                 <ArrowRight {...icon} />
@@ -61,7 +94,7 @@ export default async function Home() {
           </div>
 
           <figure>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-surface-container lg:aspect-auto lg:h-[min(640px,calc(100svh-12rem))]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-primary-container lg:aspect-auto lg:h-[min(640px,calc(100svh-12rem))]">
               <Image
                 src={asset("/images/gallery/eingang.jpeg")}
                 alt={hero.imageAlt}
@@ -71,7 +104,7 @@ export default async function Home() {
                 className="object-cover object-[50%_55%]"
               />
             </div>
-            <figcaption className="mt-3 text-sm text-on-surface-variant">
+            <figcaption className="mt-3 text-sm text-white/70">
               {hero.imageCaption}
             </figcaption>
           </figure>
@@ -99,7 +132,10 @@ export default async function Home() {
                   {f.label}
                 </dt>
                 <dd className="text-2xl font-medium tabular-nums text-primary">
-                  {f.value.replace("{services}", String(visibleServices.length))}
+                  {f.value.replace(
+                    "{services}",
+                    String(visibleServices.length),
+                  )}
                 </dd>
               </div>
             ))}
@@ -275,7 +311,7 @@ export default async function Home() {
             <h3 className="text-sm font-medium text-white/60">
               {contact.hoursHeading}
             </h3>
-            <OpeningHours tone="dark" className="mt-4" />
+            <OpeningHours hours={openingHours} tone="dark" className="mt-4" />
             <Link
               href="/anfahrt"
               className="mt-6 flex min-h-11 items-center gap-2 text-sm text-white/70 transition-colors duration-150 ease-out hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"

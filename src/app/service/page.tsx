@@ -27,7 +27,7 @@ const serviceFeatures = [
     icon: ParkingSquare,
     title: "Parkplätze",
     description:
-      "Zwei Parkplätze stehen direkt vor der Praxis zur Verfügung. Bequem erreichbar ohne lange Fußwege.",
+      "Parkplätze stehen direkt vor der Praxis zur Verfügung. Bequem erreichbar ohne lange Fußwege.",
   },
   {
     icon: Baby,

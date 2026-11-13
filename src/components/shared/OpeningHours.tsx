@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { siteData } from "@content/site-data";
+import type { OpeningHoursEntry } from "@/lib/site-settings";
 import { cn } from "@/lib/utils";
 
 const weekdayFormat = new Intl.DateTimeFormat("de-DE", {
@@ -20,9 +20,11 @@ const getServerToday = () => null;
  * vacations are handled elsewhere.
  */
 export function OpeningHours({
+  hours,
   tone = "light",
   className,
 }: {
+  hours: OpeningHoursEntry[];
   tone?: "light" | "dark";
   className?: string;
 }) {
@@ -31,7 +33,7 @@ export function OpeningHours({
 
   return (
     <dl className={cn("text-sm", className)}>
-      {siteData.openingHours.map((h) => {
+      {hours.map((h) => {
         const isToday = h.day === today;
         return (
           <div

@@ -28,7 +28,7 @@ export const siteData = {
     { day: "Montag", hours: "8:00 – 18:00", break: "12:00 – 13:00" },
     { day: "Dienstag", hours: "8:00 – 18:00", break: "12:00 – 13:00" },
     { day: "Mittwoch", hours: "8:00 – 13:00", break: null },
-    { day: "Donnerstag", hours: "8:00 – 19:00", break: "12:00 – 13:00" },
+    { day: "Donnerstag", hours: "8:00 – 18:00", break: "12:00 – 13:00" },
     { day: "Freitag", hours: "8:00 – 13:00", break: null },
   ],
 

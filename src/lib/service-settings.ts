@@ -43,6 +43,11 @@ function normalize(settings: ServiceSettings): ServiceSettings {
             pageTitle: service.pageTitle?.trim() || title,
             shortDescription: normalizeText(service.shortDescription),
             image: service.image?.trim() || undefined,
+            images: Array.isArray(service.images)
+              ? service.images
+                  .map((src) => (typeof src === "string" ? src.trim() : ""))
+                  .filter(Boolean)
+              : [],
             content: Array.isArray(service.content)
               ? service.content.flatMap(splitParagraphs)
               : [],

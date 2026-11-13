@@ -110,6 +110,24 @@ export default async function ServiceDetailPage({
                     className="space-y-5"
                     paragraphClassName="text-base text-on-surface-variant leading-[1.8]"
                   />
+                  {service.images && service.images.length > 0 && (
+                    <div className="grid gap-4 pt-6 sm:grid-cols-2">
+                      {service.images.map((src, i) => (
+                        <div
+                          key={`${i}-${src}`}
+                          className="overflow-hidden rounded-xl bg-surface-container"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={src.startsWith("data:") ? src : asset(src)}
+                            alt={`${service.title} – Foto ${i + 2}`}
+                            loading="lazy"
+                            className="aspect-[4/3] w-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </FadeIn>
 

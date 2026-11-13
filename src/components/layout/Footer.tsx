@@ -4,9 +4,13 @@ import { navigation } from "@content/pages";
 import { getServiceSettings, serviceMenuLabel } from "@/lib/service-settings";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { OpeningHours } from "@/components/shared/OpeningHours";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export default async function Footer() {
-  const { services } = await getServiceSettings();
+  const [{ services }, { openingHours }] = await Promise.all([
+    getServiceSettings(),
+    getSiteSettings(),
+  ]);
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
 
   return (
@@ -83,7 +87,7 @@ export default async function Footer() {
             <h4 className="text-sm font-medium text-primary mb-4">
               Sprechzeiten
             </h4>
-            <OpeningHours className="-my-2" />
+            <OpeningHours hours={openingHours} className="-my-2" />
           </div>
 
           {/* Quick links */}

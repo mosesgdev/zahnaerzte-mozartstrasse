@@ -11,10 +11,19 @@ import {
 } from "react";
 import type { SettingsFormState } from "@/app/admin/actions";
 import { asset } from "@/lib/utils";
+import { RichText } from "@/components/shared/RichText";
 import { joinParagraphs, splitLines, splitParagraphs } from "@/lib/text";
 import {
   AlertCircle,
   ArrowDown,
+  Bold,
+  Eye,
+  Heading2,
+  Italic,
+  Link2,
+  List,
+  ListOrdered,
+  PencilLine,
   ArrowUp,
   CheckCircle2,
   ChevronDown,
@@ -250,31 +259,166 @@ export function TextField({
   );
 }
 
-/** Free text; line breaks and blank lines (paragraphs) are kept as typed. */
+export const MARKDOWN_HINT = (
+  <>
+    Leerzeile = neuer Absatz. Formatieren mit den Knöpfen oder direkt:{" "}
+    <code>**fett**</code>, <code>*kursiv*</code>, <code>- Liste</code>,{" "}
+    <code>## Zwischenüberschrift</code>, <code>[Linktext](https://…)</code>.
+  </>
+);
+
+type MarkdownAction = {
+  label: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  apply: (selected: string) => { text: string; inline?: boolean; prefix?: string };
+};
+
+const markdownActions: MarkdownAction[] = [
+  { label: "Fett", title: "Fett (**Text**)", icon: Bold, apply: (t) => ({ text: `**${t || "fetter Text"}**`, inline: true }) },
+  { label: "Kursiv", title: "Kursiv (*Text*)", icon: Italic, apply: (t) => ({ text: `*${t || "kursiver Text"}*`, inline: true }) },
+  { label: "Zwischenüberschrift", title: "Zwischenüberschrift (## Text)", icon: Heading2, apply: (t) => ({ text: t || "Zwischenüberschrift", prefix: "## " }) },
+  { label: "Liste", title: "Aufzählung (- Punkt)", icon: List, apply: (t) => ({ text: t || "Punkt", prefix: "- " }) },
+  { label: "Nummerierte Liste", title: "Nummerierte Liste (1. Punkt)", icon: ListOrdered, apply: (t) => ({ text: t || "Punkt", prefix: "1. " }) },
+  { label: "Link", title: "Link ([Text](https://…))", icon: Link2, apply: (t) => ({ text: `[${t || "Linktext"}](https://)`, inline: true }) },
+];
+
+/** Applies a toolbar action to the textarea selection; returns new value + cursor. */
+function applyMarkdown(
+  value: string,
+  start: number,
+  end: number,
+  action: MarkdownAction,
+): { value: string; cursor: number } {
+  const selected = value.slice(start, end);
+  const result = action.apply(selected);
+  if (result.inline) {
+    const next = value.slice(0, start) + result.text + value.slice(end);
+    return { value: next, cursor: start + result.text.length };
+  }
+  // Line-based: prefix every selected line, starting at the beginning of the line.
+  const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+  const block = selected ? value.slice(lineStart, end) : result.text;
+  const prefixed = block
+    .split("\n")
+    .map((line, i) =>
+      result.prefix === "1. " ? `${i + 1}. ${line}` : `${result.prefix}${line}`,
+    )
+    .join("\n");
+  const from = selected ? lineStart : start;
+  const needsBreak = !selected && from > 0 && value[from - 1] !== "\n";
+  const insert = (needsBreak ? "\n" : "") + prefixed;
+  const next = value.slice(0, from) + insert + value.slice(end);
+  return { value: next, cursor: from + insert.length };
+}
+
+/**
+ * Free text; line breaks and blank lines (paragraphs) are kept as typed.
+ * With `markdown`, a small toolbar and a preview are shown; the website
+ * renders the text as Markdown (see components/shared/RichText).
+ */
 export function TextAreaField({
   label,
-  hint = PARAGRAPH_HINT,
+  hint,
   value,
   onChange,
   rows = 5,
+  markdown = false,
 }: {
   label: string;
   hint?: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   rows?: number;
+  markdown?: boolean;
 }) {
   const id = useId();
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const [preview, setPreview] = useState(false);
+  const shownHint = hint ?? (markdown ? MARKDOWN_HINT : PARAGRAPH_HINT);
+
+  function run(action: MarkdownAction) {
+    const el = ref.current;
+    if (!el) return;
+    const { value: next, cursor } = applyMarkdown(
+      value,
+      el.selectionStart,
+      el.selectionEnd,
+      action,
+    );
+    onChange(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(cursor, cursor);
+    });
+  }
+
   return (
-    <FieldShell id={id} label={label} hint={hint}>
-      <textarea
-        id={id}
-        className={`${fieldClass} leading-relaxed`}
-        rows={rows}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-describedby={hint ? `${id}-hint` : undefined}
-      />
+    <FieldShell id={id} label={label} hint={shownHint}>
+      {markdown && (
+        <div
+          role="toolbar"
+          aria-label={`Formatierung für „${label}“`}
+          className="mb-2 flex flex-wrap items-center gap-1.5"
+        >
+          {markdownActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <button
+                key={action.label}
+                type="button"
+                title={action.title}
+                aria-label={action.label}
+                disabled={preview}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => run(action)}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-surface text-on-surface-variant ring-1 ring-outline-variant/40 hover:bg-surface-high hover:text-primary disabled:opacity-40"
+              >
+                <Icon className="w-4.5 h-4.5" />
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            aria-pressed={preview}
+            onClick={() => setPreview((v) => !v)}
+            className={`ml-auto inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold ${
+              preview
+                ? "bg-primary text-white"
+                : "bg-secondary/10 text-secondary hover:bg-secondary/15"
+            }`}
+          >
+            {preview ? <PencilLine className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {preview ? "Bearbeiten" : "Vorschau"}
+          </button>
+        </div>
+      )}
+      {markdown && preview ? (
+        <div
+          className={`${fieldClass} min-h-24 bg-surface`}
+          aria-label={`Vorschau „${label}“`}
+        >
+          {value.trim() ? (
+            <RichText
+              text={value}
+              className="space-y-3"
+              paragraphClassName="text-base leading-relaxed text-on-surface-variant"
+            />
+          ) : (
+            <p className="text-sm text-on-surface-variant/70">Noch kein Text.</p>
+          )}
+        </div>
+      ) : (
+        <textarea
+          ref={ref}
+          id={id}
+          className={`${fieldClass} leading-relaxed ${markdown ? "font-mono text-[15px]" : ""}`}
+          rows={rows}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          aria-describedby={shownHint ? `${id}-hint` : undefined}
+        />
+      )}
     </FieldShell>
   );
 }
@@ -285,7 +429,7 @@ export function TextAreaField({
  */
 export function ParagraphsField({
   label,
-  hint = PARAGRAPH_HINT,
+  hint,
   value,
   onChange,
   rows = 8,
@@ -299,6 +443,7 @@ export function ParagraphsField({
   const [text, setText] = useState(() => joinParagraphs(value));
   return (
     <TextAreaField
+      markdown
       label={label}
       hint={hint}
       rows={rows}

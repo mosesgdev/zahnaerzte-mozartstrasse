@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pages } from "@content/pages";
 import { siteData } from "@content/site-data";
+import { getSiteSettings } from "@/lib/site-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { MapPin, Phone, Mail, Clock, Car } from "lucide-react";
 
@@ -9,7 +10,8 @@ export const metadata: Metadata = {
   description: pages.directions.metaDescription,
 };
 
-export default function AnfahrtPage() {
+export default async function AnfahrtPage() {
+  const { openingHours } = await getSiteSettings();
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
   const address = siteData.practice.address;
   const mapsQuery = encodeURIComponent(
@@ -84,7 +86,7 @@ export default function AnfahrtPage() {
                     Parken
                   </h3>
                   <p className="text-sm text-on-surface-variant leading-relaxed">
-                    Zwei Parkplätze stehen direkt vor der Praxis zur Verfügung.
+                    Parkplätze stehen direkt vor der Praxis zur Verfügung.
                   </p>
                 </div>
               </FadeIn>
@@ -122,7 +124,7 @@ export default function AnfahrtPage() {
                     Sprechzeiten
                   </h3>
                   <div className="space-y-2.5">
-                    {siteData.openingHours.map((h) => (
+                    {openingHours.map((h) => (
                       <div
                         key={h.day}
                         className="flex justify-between text-sm text-on-surface-variant"

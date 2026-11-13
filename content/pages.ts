@@ -57,7 +57,7 @@ export const pages: Record<string, PageData> = {
       "Bitte teilen Sie uns bei der Terminvereinbarung mit, welche Unterstützung Sie benötigen.",
       "Rollstuhlgerechter Eingang mit sanfter Rampe direkt in die Praxis.",
       "Größerer Wickeltisch (Tragfähigkeit bis 30 kg) im barrierefreien Bad.",
-      "Zwei Parkplätze direkt vor der Praxis.",
+      "Parkplätze direkt vor der Praxis.",
     ],
   },
 
@@ -69,7 +69,7 @@ export const pages: Record<string, PageData> = {
       "Anfahrt zur Zahnarztpraxis Boris Shuk, Mozartstraße 10, 21423 Winsen (Luhe). Google Maps, Parkplätze vor der Tür.",
     content: [
       "Sie finden uns in der Mozartstraße 10, 21423 Winsen (Luhe).",
-      "Zwei Parkplätze stehen direkt vor der Praxis zur Verfügung.",
+      "Parkplätze stehen direkt vor der Praxis zur Verfügung.",
     ],
   },
 

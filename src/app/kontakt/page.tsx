@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pages } from "@content/pages";
 import { siteData } from "@content/site-data";
+import { getSiteSettings } from "@/lib/site-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
 import { Phone, Mail, MapPin, Clock, Printer } from "lucide-react";
 
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   description: pages.contact.metaDescription,
 };
 
-export default function KontaktPage() {
+export default async function KontaktPage() {
+  const { openingHours } = await getSiteSettings();
   const phoneHref = `tel:${siteData.practice.phone.replace(/[\s/]/g, "")}`;
 
   return (
@@ -123,7 +125,7 @@ export default function KontaktPage() {
                   Sprechzeiten
                 </h2>
                 <div className="space-y-3.5">
-                  {siteData.openingHours.map((h) => (
+                  {openingHours.map((h) => (
                     <div
                       key={h.day}
                       className="flex justify-between items-center text-base"

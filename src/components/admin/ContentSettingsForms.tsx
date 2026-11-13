@@ -5,8 +5,10 @@ import {
   updateEmergencySettingsAction,
   updateGallerySettingsAction,
   updateServiceSettingsAction,
+  updateSiteSettingsAction,
   updateTeamSettingsAction,
 } from "@/app/admin/actions";
+import type { OpeningHoursEntry, SiteSettings } from "@/lib/site-settings";
 import type { EmergencyEntry, EmergencySettings } from "@/lib/emergency-settings";
 import type { GallerySettings } from "@/lib/gallery-settings";
 import type { ServiceSettings } from "@/lib/service-settings";
@@ -465,6 +467,11 @@ export function ServiceSettingsForm({ initial }: { initial: ServiceSettings }) {
                   sizeHint="Querformat, mindestens 1200 Pixel breit"
                   aspect="aspect-[16/9]"
                 />
+                <ExtraImagesField
+                  images={service.images ?? []}
+                  alt={service.title || "Leistung"}
+                  onChange={(images) => updateService(service._key, { images })}
+                />
                 <CheckboxField
                   label="Als „Demnächst“ markieren"
                   hint="Zeigt einen Hinweis, dass diese Seite noch erweitert wird."
@@ -726,6 +733,173 @@ export function EmergencySettingsForm({ initial }: { initial: EmergencySettings 
         dirty={dirty}
         label="Notdienst speichern"
         publicHref="/notdienst"
+      />
+    </form>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+
+/** Further photos of a service, shown below the text on its page. */
+function ExtraImagesField({
+  images,
+  alt,
+  onChange,
+}: {
+  images: string[];
+  alt: string;
+  onChange: (images: string[]) => void;
+}) {
+  return (
+    <div className="space-y-5 rounded-lg bg-surface p-4">
+      <div>
+        <p className="block text-base font-semibold text-primary">Weitere Fotos</p>
+        <p className="mt-1 text-sm text-on-surface-variant leading-relaxed">
+          Erscheinen unter dem Text der Leistungsseite. Beliebig viele möglich.
+        </p>
+      </div>
+      {images.map((src, index) => (
+        <div key={`${index}-${src}`} className="space-y-2">
+          <ImageUploadField
+            label={`Foto ${index + 2}`}
+            value={src}
+            onChange={(next) =>
+              onChange(
+                next
+                  ? images.map((item, i) => (i === index ? next : item))
+                  : images.filter((_, i) => i !== index),
+              )
+            }
+            alt={alt}
+            sizeHint="Querformat empfohlen"
+          />
+        </div>
+      ))}
+      <AddButton onClick={() => onChange([...images, ""])}>
+        <Plus className="w-5 h-5" />
+        Weiteres Foto hinzufügen
+      </AddButton>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Start page: opening hours + announcement                            */
+/* ------------------------------------------------------------------ */
+
+export function SiteSettingsForm({ initial }: { initial: SiteSettings }) {
+  const { settings, setSettings, payload, state, action, pending, dirty } =
+    useSettingsForm(initial, updateSiteSettingsAction, json);
+
+  function updateHours(index: number, patch: Partial<OpeningHoursEntry>) {
+    setSettings((current) => ({
+      ...current,
+      openingHours: current.openingHours.map((entry, i) =>
+        i === index ? { ...entry, ...patch } : entry,
+      ),
+    }));
+  }
+
+  function updateAnnouncement(patch: Partial<SiteSettings["announcement"]>) {
+    setSettings((current) => ({
+      ...current,
+      announcement: { ...current.announcement, ...patch },
+    }));
+  }
+
+  return (
+    <form action={action} className="space-y-10">
+      <input type="hidden" name="payload" value={payload} />
+
+      <FormSection
+        title="Hinweis für Patienten"
+        description="Erscheint ganz oben auf der Startseite, z. B. Neujahrsgrüße, geänderte Zeiten oder Praxisurlaub. Zum Ausblenden den Haken entfernen; der Text bleibt gespeichert."
+      >
+        <CheckboxField
+          label="Hinweis auf der Startseite zeigen"
+          checked={settings.announcement.enabled}
+          onChange={(enabled) => updateAnnouncement({ enabled })}
+        />
+        <TextField
+          label="Überschrift"
+          value={settings.announcement.title}
+          onChange={(title) => updateAnnouncement({ title })}
+          placeholder="z. B. Liebe Patientinnen und Patienten"
+        />
+        <TextAreaField
+          label="Text"
+          rows={5}
+          value={settings.announcement.text}
+          onChange={(text) => updateAnnouncement({ text })}
+        />
+      </FormSection>
+
+      <FormSection
+        title="Sprechzeiten"
+        description="Gelten überall auf der Website (Startseite, Kontakt, Anfahrt, Fußzeile). Schreibweise z. B. „8:00 – 18:00“. Leere Pause = keine Pause."
+      >
+        <div className="space-y-3">
+          {settings.openingHours.map((entry, index) => (
+            <div
+              key={index}
+              className="grid gap-3 rounded-xl bg-surface-container/50 p-3 ring-1 ring-outline-variant/30 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end"
+            >
+              <TextField
+                label="Tag"
+                required
+                value={entry.day}
+                onChange={(day) => updateHours(index, { day })}
+              />
+              <TextField
+                label="Uhrzeit"
+                value={entry.hours}
+                onChange={(hours) => updateHours(index, { hours })}
+                placeholder="8:00 – 18:00"
+              />
+              <TextField
+                label="Pause"
+                value={entry.break ?? ""}
+                onChange={(value) => updateHours(index, { break: value })}
+                placeholder="12:00 – 13:00"
+              />
+              <button
+                type="button"
+                aria-label={`${entry.day || "Zeile"} entfernen`}
+                title="Zeile entfernen"
+                onClick={() => {
+                  if (window.confirm(`„${entry.day || "Zeile"}“ aus den Sprechzeiten entfernen?`)) {
+                    setSettings((current) => ({
+                      ...current,
+                      openingHours: current.openingHours.filter((_, i) => i !== index),
+                    }));
+                  }
+                }}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <AddButton
+          onClick={() =>
+            setSettings((current) => ({
+              ...current,
+              openingHours: [...current.openingHours, { day: "", hours: "", break: null }],
+            }))
+          }
+        >
+          <Plus className="w-5 h-5" />
+          Tag hinzufügen
+        </AddButton>
+      </FormSection>
+
+      <SaveBar
+        state={state}
+        pending={pending}
+        dirty={dirty}
+        label="Speichern"
+        publicHref="/"
       />
     </form>
   );

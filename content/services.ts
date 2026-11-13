@@ -6,6 +6,8 @@ export interface Service {
   pageTitle: string;
   shortDescription: string;
   image?: string;
+  /** Further photos shown below the text of the service page. */
+  images?: string[];
   content: string[];
   bulletPoints?: string[];
   underConstruction?: boolean;

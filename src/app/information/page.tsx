@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { pages } from "@content/pages";
 import { siteData } from "@content/site-data";
+import { getSiteSettings } from "@/lib/site-settings";
 import { FadeIn } from "@/components/shared/FadeIn";
 import {
   CreditCard,
@@ -50,7 +51,8 @@ const infoCards = [
   },
 ];
 
-export default function InformationPage() {
+export default async function InformationPage() {
+  const { openingHours } = await getSiteSettings();
   return (
     <>
       {/* Header */}
@@ -98,7 +100,7 @@ export default function InformationPage() {
               </h2>
               <div className="bg-card rounded-xl p-8 shadow-[0_20px_40px_rgba(16,59,92,0.05)]">
                 <div className="space-y-4">
-                  {siteData.openingHours.map((h) => (
+                  {openingHours.map((h) => (
                     <div
                       key={h.day}
                       className="flex justify-between items-center text-base"

@@ -2,6 +2,7 @@ import {
   CalendarOff,
   FileText,
   Images,
+  House,
   Stethoscope,
   Users,
   type LucideIcon,
@@ -19,6 +20,15 @@ export interface AdminSection {
 }
 
 export const adminSections: AdminSection[] = [
+  {
+    key: "startseite",
+    title: "Startseite & Sprechzeiten",
+    href: "/admin/startseite",
+    publicHref: "/",
+    description:
+      "Sprechzeiten ändern und einen eigenen Hinweis für Patienten auf der Startseite zeigen (z. B. Neujahrsgrüße).",
+    icon: House,
+  },
   {
     key: "notdienst",
     title: "Notdienst",
